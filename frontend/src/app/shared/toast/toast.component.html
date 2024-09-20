@@ -1,0 +1,9 @@
+<ng-container>
+    <c-toast-header [closeButton]="closeButton">
+        <strong>{{title}}</strong>
+    </c-toast-header>
+    <c-toast-body #toastBody [cToastClose]="toastBody.toast">
+        <p class="mb-1">{{msg}}</p>
+        <ng-content></ng-content>
+    </c-toast-body>
+</ng-container>

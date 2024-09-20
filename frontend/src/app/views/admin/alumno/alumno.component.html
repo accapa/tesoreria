@@ -1,0 +1,218 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Listado de alumnos</strong>
+            </c-card-header>
+            <c-card-body>
+                <button cButton (click)="toggleForm()" color="primary" size="sm">
+                    <svg cIcon class="me-1" name="cil-plus"></svg>Nuevo</button>
+
+                <button cButton (click)="toggleSearchForm()" color="primary" size="sm">
+                    <svg cIcon class="me-0" name="cil-search"></svg></button>
+
+                <div [visible]="showFormSearch" cCollapse>
+                    <c-card class="mt-3 shadow">
+                        <c-card-header>
+                            <strong>Buscar</strong>
+                        </c-card-header>
+                        <c-card-body class="search-form">
+                            <form cForm class="row g-3" [formGroup]="searchForm" novalidate (ngSubmit)="searchSubmit()">
+                                <c-col [md]="3">
+                                    <label cLabel>Grupo</label>
+                                    <ng-select [items]="grupos" bindLabel="descripcion" bindValue="idGrupo" placeholder="Seleccionar" formControlName="idGrupo">
+                                    </ng-select>
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="_dni">DNI</label>
+                                    <input cFormControl id="_dni" type="text" formControlName="dni" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="_nombres">Nombres y apellidos</label>
+                                    <input cFormControl id="_nombres" type="text" formControlName="nombres" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="fechaDesde">F. registro (desde)</label>
+                                    <input cFormControl id="fechaDesde" type="date" formControlName="fechaDesde" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="fechaHasta">F. registro (hasta)</label>
+                                    <input cFormControl id="fechaHasta" type="date" formControlName="fechaHasta" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel>Estado</label>
+                                    <ng-select id="_id_estado" placeholder="Seleccionar" formControlName="estado">
+                                        <ng-option [value]="1">Activo</ng-option>
+                                        <ng-option [value]="0">Inactivo</ng-option>
+                                    </ng-select>
+                                </c-col>
+
+                                <c-col [xs]="12">
+                                    <button cButton type="submit" size="sm">
+                                        <svg cIcon class="me-1" name="cil-search"></svg>Buscar</button>
+                                    <button cButton type="button" (click)="onResetSearchForm()" color="secondary" size="sm">
+                                        <svg cIcon class="me-1" name="cil-x-circle"></svg>Limpiar filtro</button>
+                                    <button cButton type="button" (click)="toggleSearchForm()" color="secondary" size="sm">
+                                        <svg cIcon class="me-1" name="cil-x"></svg>Cerrar</button>
+                                </c-col>
+                            </form>
+                        </c-card-body>
+                    </c-card>
+                </div>
+                <hr />
+                <div style="padding-bottom: 5px; text-align: right;">
+                    <button cButton type="button" (click)="toExcel()" color="secondary" size="sm">
+                        <svg cIcon class="me-1" name="cil-spreadsheet"></svg>Excel</button>
+                </div>
+                <table bordered cTable [striped]="true" [hover]="true" small [responsive]="true">
+                    <thead cTableColor="dark">
+                        <tr>
+                            <th scope="col" sortable="idAlumno" (sort)="onSort($event)">#</th>
+                            <th scope="col" sortable="grupoDescripcion" (sort)="onSort($event)">Grupo</th>
+                            <th scope="col" sortable="dni" (sort)="onSort($event)">DNI</th>
+                            <th scope="col" sortable="apellidos" (sort)="onSort($event)">Ap. y nombres</th>
+                            <th scope="col" sortable="fechaRegistro" (sort)="onSort($event)">F. registro</th>
+                            <th scope="col" sortable="fechaRegistro" (sort)="onSort($event)">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of alumnos">
+                            <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
+                            <td>{{ item.grupoDescripcion }}</td>
+                            <td style="width: 100px;">{{ item.dni }}</td>
+                            <td>{{ item.apellidos }} {{ item.nombres }}</td>
+                            <td width="150px">{{item.fechaRegistro}}</td>
+                            <td style="width: 150px;"><span *ngIf="item.estado">{{ estadoReg(item.estado) }}</span>
+                                <div class="destructive">
+                                    <button cButton size="sm" (click)="getData(item)" color="primary">
+                                            <svg cIcon class="me-0" name="cil-pencil"></svg>
+                                        </button>
+                                    <button cButton size="sm" (click)="deleteData(item)" color="primary">
+                                            <svg cIcon class="me-0" name="cil-trash"></svg>
+                                        </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="11" style="text-align: right;">{{totalItems}} registros</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+
+                <ngb-pagination (pageChange)="transition($event)" [(page)]="page" [collectionSize]="totalItems" [maxSize]="5" [pageSize]="itemsPerPage" [rotate]="true"></ngb-pagination>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>
+
+<c-modal #modalLg id="modalLg" [visible]="modalFormVisible" (visibleChange)="handleModalChange($event)" backdrop="static">
+    <c-modal-header>
+        <h5 cModalTitle>{{prodCatForm.controls['idAlumno'].value ? 'Modificar' : 'Registrar'}} alumno</h5>
+        <button (click)="onResetMarcaForm()" cButtonClose></button>
+    </c-modal-header>
+    <c-modal-body>
+        <c-row>
+            <c-col md="12">
+                <form cForm [formGroup]="prodCatForm" novalidate (ngSubmit)="onSubmit()">
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col">Grupo</label>
+                        <c-col [sm]="8" *ngIf="prodCatForm.controls['idGrupo'] as ctrl">
+                            <ng-select id="_id_sucursal" [items]="grupos" bindLabel="descripcion" bindValue="idGrupo" placeholder="Seleccionar" formControlName="idGrupo" [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
+                            </ng-select>
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Seleccionar grupo
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+
+
+                    <c-row class="mb-1" *ngIf="prodCatForm.controls['dni'] as ctrl">
+                        <label cCol [sm]="4" cLabel="col" for="dni">DNI</label>
+                        <c-input-group cCol>
+                            <input cFormControl id="dni" formControlName="dni" placeholder="DNI" autocomplete="off" required [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" maxlength="8" />
+                            <button cButton color="primary" type="button" (click)="searchDniInApi()" [disabled]="isLoading">
+                                <svg cIcon class="me-0" name="cil-search" *ngIf="!isLoading; else showCarga"></svg>
+                                <ng-template #showCarga>
+                                    <c-spinner aria-hidden="true" size="sm"></c-spinner>
+                                </ng-template>
+                            </button>
+                            <c-form-feedback *ngIf="ctrl.invalid" [valid]="!(ctrl.invalid)">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">DNI es requerido</div>
+                                    <div *ngIf="errors?.minlength">
+                                        DNI debe tener 8 números
+                                    </div>
+                                    <div *ngIf="errors?.maxlength">
+                                        DNI debe tener 8 números
+                                    </div>
+                                    <div *ngIf="errors.pattern">
+                                        DNI debe contener solo números [0-9]
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-input-group>
+                    </c-row>
+
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="nombres">Nombres</label>
+                        <c-col [sm]="8" *ngIf="prodCatForm.controls['nombres'] as ctrl">
+                            <input cFormControl id="nombres" type="text" formControlName="nombres" placeholder="Nombres" autocomplete="off" required [valid]="
+                          ctrl.touched && ctrl.valid ? true: ctrl.touched && ctrl.invalid ? false : undefined" />
+                            <c-form-feedback *ngIf="ctrl.invalid" [valid]="!(ctrl.invalid)">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Nombres es requerido</div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="apellidos">Apellidos</label>
+                        <c-col [sm]="8" *ngIf="prodCatForm.controls['apellidos'] as ctrl">
+                            <input cFormControl id="apellidos" type="text" formControlName="apellidos" placeholder="Apellidos" autocomplete="off" required [valid]="
+                          ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                            <c-form-feedback *ngIf="ctrl.invalid" [valid]="!(ctrl.invalid)">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Apellidos es requerido</div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col">Estado</label>
+                        <c-col [sm]="8" *ngIf="prodCatForm.controls['estado'] as ctrl">
+                            <ng-select placeholder="Seleccionar" formControlName="estado" [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
+                                <ng-option value="1">Activo</ng-option>
+                                <ng-option value="0">Inactivo</ng-option>
+                            </ng-select>
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Estado es requerido
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+
+                    <hr />
+                    <c-row class="mb-1" style="text-align: right;">
+                        <c-col>
+                            <button cButton color="primary" type="submit" [disabled]="prodCatForm.invalid" [tabindex]="'0'">
+                                <svg cIcon class="me-1" name="cil-save"></svg>Guardar
+                            </button>&nbsp;
+                            <button cButton color="secondary" type="reset" (click)="onResetMarcaForm()" [tabindex]="'0'">
+                                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+                            </button>
+                        </c-col>
+                    </c-row>
+                </form>
+            </c-col>
+        </c-row>
+    </c-modal-body>
+</c-modal>

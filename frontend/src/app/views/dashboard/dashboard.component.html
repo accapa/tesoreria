@@ -1,0 +1,175 @@
+<c-card class="mb-4">
+    <c-card-header ngPreserveWhitespaces>
+        <strong>Reporte de ingresos</strong>
+    </c-card-header>
+    <c-card-body>
+        <form [formGroup]="searchForm" (ngSubmit)="searchSubmit()">
+            <c-input-group>
+                <select aria-label="Default select example" cSelect formControlName="idGrupo">
+                    <option value="">-Sucursal-</option>
+                    <option *ngFor="let item of sucursales;" [value]="item.idGrupo">{{item.nombre}}</option>
+                </select>
+                <input cFormControl id="fecha" type="week" formControlName="fecha" placeholder="Fecha"
+                    [value]="weekNow" />
+                <button cButton color="primary" type="submit" title="Buscar">
+                    <svg cIcon class="me-0" name="cil-search"></svg>
+                </button>
+            </c-input-group>
+        </form>
+        <hr />
+        <c-chart type="bar" [data]="chartBarData" height="250">Ingresos</c-chart>
+    </c-card-body>
+    <c-card-footer>
+        <c-row class="text-center" [md]="5" [xs]="1">
+            <c-col class="mb-sm-2 mb-0">
+                <strong>Monto total: {{totalIngresos | currency:'S/ ':'symbol':'1.2-2'}}</strong>
+            </c-col>
+        </c-row>
+    </c-card-footer>
+</c-card>
+
+<c-row>
+    <c-col xs>
+        <c-card class="mb-4">
+            <c-card-header><strong>Clientes nuevos {{ "&" }} concurrentes</strong></c-card-header>
+            <c-card-body>
+                <form cForm class="row g-3" [formGroup]="clienteForm" novalidate (ngSubmit)="clienteSubmit()">
+                    <c-col [md]="3">
+                        <label for="idsucursal" cLabel>Sucursal</label>
+                        <select id="idsucursal" aria-label="Default select example" cSelect formControlName="idGrupo">
+                            <option value="">-Sucursal-</option>
+                            <option *ngFor="let item of sucursales;" [value]="item.idGrupo">{{item.nombre}}</option>
+                        </select>
+                    </c-col>
+                    <c-col [md]="3">
+                        <label cLabel for="fechaRegDesde">F. reg. (desde)</label>
+                        <input cFormControl id="fechaRegDesde" type="date" formControlName="fechaDesde" />
+                    </c-col>
+                    <c-col [md]="3">
+                        <label cLabel for="fechaRegHasta">F. reg. (hasta)</label>
+                        <input cFormControl id="fechaRegHasta" type="date" formControlName="fechaHasta" />
+                    </c-col>
+
+                    <c-col [xs]="3">
+                        <div style="height: 30px;"></div>
+                        <button cButton type="submit">
+                            <svg cIcon class="me-0" name="cil-search"></svg></button>
+                    </c-col>
+                </form>
+                <hr />
+                <c-row>
+                    <c-col md="6" xl="6" xs="12">
+                        <c-row>
+                            <c-col sm="6">
+                                <div class="border-start border-start-4 border-start-info py-1 px-3 mb-3">
+                                    <div class="text-medium-emphasis small">Nuevos clientes</div>
+                                    <div class="fs-5 fw-semibold">{{clientesNuevos | number:'1.0-0'}}</div>
+                                </div>
+                            </c-col>
+                            <c-col sm="6">
+                                <div class="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
+                                    <div class="text-medium-emphasis small">
+                                        Clientes concurrentes
+                                    </div>
+                                    <div class="fs-5 fw-semibold">{{clientesConcure | number:'1.0-0'}}</div>
+                                </div>
+                            </c-col>
+                        </c-row>
+
+                        <hr class="mt-0" />
+
+                        <ng-container *ngFor="let item of clientes; let i = index">
+                            <div class="progress-group mb-4">
+                                <div class="progress-group-prepend">
+                                    <span class="text-medium-emphasis small">{{item.ventaFechaReg}}</span>
+                                </div>
+                                <div class="progress-group-bars">
+                                    <c-progress thin>
+                                        <c-progress-bar color="info" [value]="item.nuevos"></c-progress-bar>
+                                    </c-progress>
+                                    <c-progress thin>
+                                        <c-progress-bar color="danger" [value]="item.concurrentes"></c-progress-bar>
+                                    </c-progress>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <div class="legend text-center" ngPreserveWhitespaces>
+                            <small>
+                                <sup>
+                                    <span class="badge badge-pill badge-sm bg-info">&nbsp;</span>
+                                </sup>
+                                <span>Clientes nuevos</span>
+                                &nbsp;&nbsp;
+                                <sup>
+                                    <span class="badge badge-pill badge-sm bg-danger">&nbsp;</span>
+                                </sup>
+                                <span>Clientes concurrentes</span>
+                            </small>
+                        </div>
+                    </c-col>
+
+                    <c-col md="6" xl="6" xs="12">
+                        <c-row>
+                            <c-col sm="6">
+                                <div class="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
+                                    <div class="text-medium-emphasis small">Total varones</div>
+                                    <div class="fs-5 fw-semibold">{{clientesTotalSexo.varones | number:'1.0-0'}}</div>
+                                </div>
+                            </c-col>
+                            <c-col sm="6">
+                                <div class="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
+                                    <div class="text-medium-emphasis small">Total mujeres</div>
+                                    <div class="fs-5 fw-semibold">{{clientesTotalSexo.mujeres | number:'1.0-0'}}</div>
+                                </div>
+                            </c-col>
+                        </c-row>
+
+                        <hr class="mt-0" />
+
+                        <div class="progress-group mb-4">
+                            <div class="progress-group-header">
+                                <svg cIcon class="icon icon-lg me-2" name="cil-user"></svg>
+                                <span>Varones</span>
+                                <span class="ms-auto font-semibold">{{clientesVar | number:'1.0-0'}}</span>
+                            </div>
+                            <div class="progress-group-bars">
+                                <c-progress thin>
+                                    <c-progress-bar color="warning" [value]="clientesVar"></c-progress-bar>
+                                </c-progress>
+                            </div>
+                        </div>
+                        <div class="progress-group mb-5">
+                            <div class="progress-group-header">
+                                <svg cIcon class="icon icon-lg me-2" name="cil-user-female"></svg>
+                                <span>Mujeres</span>
+                                <span class="ms-auto font-semibold">{{clientesMuj | number:'1.0-0'}}</span>
+                            </div>
+                            <div class="progress-group-bars">
+                                <c-progress thin>
+                                    <c-progress-bar color="errors" [value]="clientesMuj"></c-progress-bar>
+                                </c-progress>
+                            </div>
+                        </div>
+                     
+                        <div class="divider d-flex justify-content-center">
+                            <button cButton class="text-muted btn-link" color="transparent" size="sm" type="button">
+                            </button>
+                        </div>
+                    </c-col>
+                </c-row>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>
+
+<c-row style="display: none;">
+    <c-col xs>
+        <c-card class="mb-4">
+            <c-card-header>Users</c-card-header>
+            <c-card-body>
+                
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>

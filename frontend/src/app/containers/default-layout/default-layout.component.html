@@ -1,0 +1,27 @@
+<!--sidebar-->
+<c-sidebar #sidebar="cSidebar" class="d-print-none sidebar sidebar-fixed" id="sidebar" visible>
+  <c-sidebar-brand [brandFull]="{
+      src: 'assets/img/brand/logo-nire-spa-blanco.png', width: 66, height: 46, alt: 'Sistema'
+    }" [brandNarrow]="{
+      src: 'assets/img/brand/logo-nire-spa-blanco.png', width: 66, height: 46, alt: 'Sistema'
+    }" routerLink="./" />
+
+  <ng-scrollbar pointerEventsMethod="scrollbar">
+    <c-sidebar-nav [navItems]="filteredNavItems" dropdownMode="close" />
+  </ng-scrollbar>
+  <c-sidebar-toggler *ngIf="!sidebar.narrow" toggle="unfoldable" cSidebarToggle="sidebar" />
+</c-sidebar>
+
+<!--main-->
+<div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent">
+  <!--app-header-->
+  <app-default-header class="mb-4 d-print-none header header-sticky" position="sticky" sidebarId="sidebar" />
+  <!--app-body-->
+  <div class="body flex-grow-1 px-3">
+    <ngx-spinner type="ball-pulse"></ngx-spinner>
+    <c-toaster class="p-3" position="fixed"></c-toaster>
+    <router-outlet />
+  </div>
+  <!--app footer-->
+  <app-default-footer />
+</div>

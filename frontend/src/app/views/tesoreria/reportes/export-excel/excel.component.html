@@ -1,0 +1,141 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Reportes</strong>
+            </c-card-header>
+            <c-card-body>
+
+                <c-row class="row row-cols-3 row-cols-lg-5 row-cols-sm-4">
+
+                    <c-col class="mb-4 col ng-star-inserted">
+                        <div class="p-3 py-4 mb-2 bg-light text-center rounded hover-pointer"
+                            (click)="handleModalChange(true)">
+                            <svg cIcon class="me-1" name="cil-chart" size="xl"></svg>
+                        </div>
+                        <div class="text-medium-emphasis text-center pt-1">Depreciación anual</div>
+                    </c-col>
+
+                    <c-col class="mb-4 col ng-star-inserted">
+                        <div class="p-3 py-4 mb-2 bg-light text-center rounded hover-pointer"
+                            (click)="handleModalMantChange(true)">
+                            <svg cIcon class="me-1" name="cil-color-border" size="xl"></svg>
+                        </div>
+                        <div class="text-medium-emphasis text-center pt-1">Mantenimiento pendientes</div>
+                    </c-col>
+
+                    <c-col class="mb-4 col ng-star-inserted">
+                        <div class="p-3 py-4 mb-2 bg-light text-center rounded hover-pointer"
+                            (click)="handleModalGarantiaChange(true)">
+                            <svg cIcon class="me-1" name="cil-av-timer" size="xl"></svg>
+                        </div>
+                        <div class="text-medium-emphasis text-center pt-1">Garantías por vencer</div>
+                    </c-col>
+
+                </c-row>
+
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>
+
+<c-modal [visible]="modalDepreciacionVisible" backdrop="static">
+    <form cForm [formGroup]="depreciacionForm" novalidate (ngSubmit)="onSubmit()">
+        <c-modal-header>
+            <h5 cModalTitle>Reporte de depreciación anual</h5>
+            <button (click)="closeModalDepreciacion()" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body class="register-form">
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="fechaHasta">Periodo</label>
+                <c-col [sm]="8" *ngIf="depreciacionForm.controls['fechaHasta'] as ctrl">
+                    <input cFormControl id="fechaHasta" type="text" pattern="[0-9]{4}" placeholder="YYYY"
+                        formControlName="fechaHasta" autocomplete="off" />
+                </c-col>
+            </c-row>
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="depreciacionForm.invalid">
+                <svg cIcon class="me-1" name="cil-save"></svg>Generar
+            </button>
+            <button cButton color="secondary" type="button" (click)="closeModalDepreciacion()">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+<c-modal [visible]="modalMantVisible" backdrop="static">
+    <form cForm [formGroup]="mantenimientoForm" novalidate (ngSubmit)="onSubmitMant()">
+        <c-modal-header>
+            <h5 cModalTitle>Reporte de mantenimiento de activos</h5>
+            <button (click)="closeModalMant()" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body class="register-form">
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="fechaDesde">Fecha mant. desde</label>
+                <c-col [sm]="8" *ngIf="mantenimientoForm.controls['fechaDesde'] as ctrl">
+                    <input cFormControl id="fechaDesde" type="date"
+                        formControlName="fechaDesde" autocomplete="off" />
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="fechaHasta">Fecha mant. hasta</label>
+                <c-col [sm]="8" *ngIf="mantenimientoForm.controls['fechaHasta'] as ctrl">
+                    <input cFormControl id="fechaHasta" type="date"
+                        formControlName="fechaHasta" autocomplete="off" />
+                </c-col>
+            </c-row>
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="mantenimientoForm.invalid">
+                <svg cIcon class="me-1" name="cil-save"></svg>Generar
+            </button>
+            <button cButton color="secondary" type="button" (click)="closeModalMant()">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+<c-modal [visible]="modalGarantiaVisible" backdrop="static">
+    <form cForm [formGroup]="garantiaForm" novalidate (ngSubmit)="onSubmitGarantia()">
+        <c-modal-header>
+            <h5 cModalTitle>Garantías por vencer</h5>
+            <button (click)="closeModalGarantia()" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body class="register-form">
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="esVencido">.</label>
+                <c-col [sm]="8" *ngIf="garantiaForm.controls['esVencido'] as ctrl">
+                    <c-form-check inline>
+                        <input cFormCheckInput id="esVencido" formControlName="esVencido" type="checkbox" (click)="toggleVencido($event)"/>
+                        <label cFormCheckLabel for="esVencido">Mostrar garantías vencidas hasta hoy</label>
+                    </c-form-check>
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="fechaDesde">Fecha garantía desde</label>
+                <c-col [sm]="8" *ngIf="garantiaForm.controls['fechaDesde'] as ctrl">
+                    <input cFormControl id="fechaDesde" type="date"
+                        formControlName="fechaDesde" autocomplete="off" />
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="fechaHasta">Fecha garantía hasta</label>
+                <c-col [sm]="8" *ngIf="garantiaForm.controls['fechaHasta'] as ctrl">
+                    <input cFormControl id="fechaHasta" type="date"
+                        formControlName="fechaHasta" autocomplete="off" />
+                </c-col>
+            </c-row>
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="garantiaForm.invalid">
+                <svg cIcon class="me-1" name="cil-save"></svg>Generar
+            </button>
+            <button cButton color="secondary" type="button" (click)="closeModalGarantia()">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
+</c-modal>

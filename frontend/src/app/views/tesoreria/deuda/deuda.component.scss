@@ -1,0 +1,42 @@
+.tableDeuda tbody tr:hover {
+    cursor: pointer;
+}
+// para resaltar los registros seleccionados
+tr.nb-deuda td {
+    color: red;
+}
+// para resaltar los registros seleccionados
+tr.nb-selected td {
+    background-color: rgba(78, 11, 49, .8);
+    color: white;
+}
+
+// imagenes adjuntos
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image-container {
+    margin: 10px;
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.delete-button {
+    position: absolute;
+    right: 1px;
+    opacity: 0 !important;
+    background-color: #ccc;
+}
+
+.image-container:hover>.delete-button {
+    opacity: 1 !important;
+}
+// fin imagenes adjuntos

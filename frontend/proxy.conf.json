@@ -1,0 +1,8 @@
+{
+  "/pagos/*": {
+      "target": "http://localhost",
+      "secure": false,
+      "logLevel": "error",
+      "changeOrigin": true
+  }
+}

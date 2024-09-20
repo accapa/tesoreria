@@ -1,0 +1,11 @@
+<div data-backdrop="static">
+    <c-modal-header>
+        <h5 cModalTitle>{{ title }}</h5>
+        <button cButtonClose (click)="dismiss()"></button>
+    </c-modal-header>
+    <c-modal-body>{{ message }}</c-modal-body>
+    <c-modal-footer>
+        <button cButton color="primary" (click)="accept()"><svg cIcon class="me-1" name="cil-check-alt"></svg>{{ btnOkText }}</button>
+        <button cButton color="secondary" (click)="decline()"><svg cIcon class="me-1" name="cil-x"></svg>{{ btnCancelText }}</button>
+    </c-modal-footer>
+</div>

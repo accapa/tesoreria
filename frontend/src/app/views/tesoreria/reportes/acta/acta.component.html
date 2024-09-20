@@ -1,0 +1,393 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Acta</strong>
+                <button cButton type="button" (click)="print()" color="primary" size="sm" style="float: right;">
+                    <svg cIcon class="me-1" name="cil-print"></svg>Imprimir</button>
+            </c-card-header>
+            <c-card-body id="printableContent">
+
+                <ng-container [ngSwitch]="tipoActa">
+                    <ng-container *ngSwitchCase="'ingreso'">
+                        <div *ngIf="acta != null; else vacio">
+                            <div style="text-align: center;">
+                                <h4>NIRE SPA</h4>
+                                <h3>ACTA DE INGRESO Nro. {{acta.nroDocumento}}</h3>
+                                <div><strong>Fecha:</strong> {{acta._fechaRegistro}}</div>
+                            </div>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Recibido por:</strong></td>
+                                        <td colspan="3">{{acta.usuarioReg}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nro. de factura:</strong></td>
+                                        <td>{{acta.nro_comprobante}} </td>
+                                        <td style="width: 200px;"><strong>Fecha factura:</strong></td>
+                                        <td>{{acta.fechaCompra}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Proveedor:</strong></td>
+                                        <td colspan="3">{{acta.proveedor}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable small class="print-table">
+                                <thead cTableColor="dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cod. barras</th>
+                                        <th>Descripción</th>
+                                        <th>Marca</th>
+                                        <th>Serie</th>
+                                        <th>Estado</th>
+                                        <th>Ubicación física</th>
+                                        <th>Valor compra</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of acta.activos; index as i">
+                                        <td>{{i + 1}}</td>
+                                        <td>{{item.codigo}}</td>
+                                        <td>{{item.descripcion}}</td>
+                                        <td>{{item.marca}}</td>
+                                        <td>{{item.nro_serie}}</td>
+                                        <td>{{item.estadoActivo}}</td>
+                                        <td>{{item.area}}</td>
+                                        <td class="align-right">{{item.valorCompra | number:'1.2-2'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable>
+                                <tr>
+                                    <td style="width: 150px;"><strong>Total activos:</strong></td>
+                                    <td style="width: 600px;">{{totalActivos}}</td>
+                                    <td style="width: 150px;"><strong>Valor total:</strong></td>
+                                    <td class="align-right">{{totalValor | number:'1.2-2'}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Observaciones:</strong></td>
+                                    <td colspan="3">{{acta.observacion}}</td>
+                                </tr>
+                            </table>
+                            <div style="height: 150px;"></div>
+                            <table cTable style="width: 100%;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <div>_______________________________</div>
+                                        <div><strong>{{acta.usuarioReg}}</strong></div>
+                                        <div>Recibido por</div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div>_______________________________</div>
+                                        <div><strong>{{acta.proveedor}}</strong></div>
+                                        <div>Entregado por</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <ng-template #vacio>
+                            <p>No existe ACTA DE INGRESO</p>
+                        </ng-template>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'asignacion'">
+                        <div *ngIf="actaAsig != null; else vacio">
+                            <div style="text-align: center;">
+                                <h4>NIRE SPA</h4>
+                                <h3>ACTA DE TRANSFERENCIA Nro. {{actaAsig.nroDocumento}}</h3>
+                                <div><strong>Fecha:</strong> {{actaAsig._fechaRegistro}}</div>
+                            </div>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Entregado por:</strong></td>
+                                        <td>{{actaAsig.trabEntrega}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Recibo por:</strong></td>
+                                        <td>{{actaAsig.trabRecibe}} </td>
+                                    </tr>
+                                   
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable small class="print-table">
+                                <thead cTableColor="dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cod. barras</th>
+                                        <th>Descripción</th>
+                                        <th>Marca</th>
+                                        <th>Serie</th>
+                                        <th>Estado</th>
+                                        <th>Ubicación origen</th>
+                                        <th>Ubicación destino</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of actaAsig.activos; index as i">
+                                        <td>{{i + 1}}</td>
+                                        <td>{{item.codigo}}</td>
+                                        <td>{{item.descripcion}}</td>
+                                        <td>{{item.marca}}</td>
+                                        <td>{{item.nro_serie}}</td>
+                                        <td>{{item.estadoActivo}}</td>
+                                        <td>{{item.areaOri}}</td>
+                                        <td>{{item.areaDes}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div><strong>Observaciones:</strong> {{actaAsig.observacion}}</div>
+                            <div style="height: 50px;"></div>
+                            <div>DECLARO QUE HE RECIBIDO LOS ACTIVOS QUE SE DETALLAN EN ESTE DOCUMENTO, EN EL CUAL CONSTA MI FIRMA DE ACEPTACIÓN DE RESPONSABILIDAD, CUSTODIO, CONSERVACIÓN Y DEVOLUCIÓN DE LOS BIENES DECLARADOS.</div>
+                            <div style="height: 150px;"></div>
+                            <table cTable style="width: 100%;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <div>_______________________________</div>
+                                        <div><strong>{{actaAsig.trabEntrega}}</strong></div>
+                                        <div><strong>DNI:</strong> {{actaAsig.dniEntrega}}</div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div>_______________________________</div>
+                                        <div><strong>{{actaAsig.trabRecibe}}</strong></div>
+                                        <div><strong>DNI:</strong> {{actaAsig.dniRecibe}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="height: 150px;"></div>
+                            Elaborado por: {{actaAsig.usuarioReg}}
+                        </div>
+                        <ng-template #vacio>
+                            <p>No existe ACTA DE TRANSFERENCIA</p>
+                        </ng-template>
+                    </ng-container>
+                    <!-- DOCUMENTO DE CAMBIO DE ESTADO -->
+                    <ng-container *ngSwitchCase="'cambioEstado'">
+                        <div *ngIf="cambioEst != null; else vacio">
+                            <div style="text-align: center;">
+                                <h4>NIRE SPA</h4>
+                                <h3>DOCUMENTO DE CAMBIO DE ESTADO DE BIENES Nro. {{cambioEst.nroDocumento}}</h3>
+                                <div><strong>Fecha:</strong> {{cambioEst._fechaDocumento}}</div>
+                            </div>
+                            <div style="height: 15px;"></div>
+                            <table bordered cTable small class="print-table">
+                                <thead cTableColor="dark">
+                                    <th>#</th>
+                                    <th>Cod. barras</th>
+                                    <th>Descripción</th>
+                                    <th>Estado origen</th>
+                                    <th>Estado destino</th>
+                                    <th>Custodio</th>
+                                    <th>Ubicación</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of cambioEst.activos; index as i">
+                                        <td>{{ i + 1}}</td>
+                                        <td>{{item.codigo}}</td>
+                                        <td>{{item.descripcion}}</td>
+                                        <td>{{item.estadoOri}}</td>
+                                        <td>{{item.estadoDes}}</td>
+                                        <td>{{item.custodio}}</td>
+                                        <td>{{item.area}}</td>
+                                   </tr>
+                                </tbody>
+                            </table>
+                            <p><strong>Observaciones:</strong> {{cambioEst.observacion}} </p>
+                            <div style="height: 100px;"></div>
+                            <div style="text-align: center;">
+                                <p style="font-weight: bold;">Autorizado por:</p>
+                                <p>_________________________</p>
+                                <p>Administrativo financiero</p>
+                            </div>
+                        </div>
+                        <ng-template #vacio>
+                            <p>No existe DOCUMENTO DE CAMBIO DE ESTADO</p>
+                        </ng-template>
+                    </ng-container>
+                    <!-- Hoja de vida del activo -->
+                    <ng-container *ngSwitchCase="'hojaVida'">
+                        <div *ngIf="hojaVida != null; else vacio">
+                            <div style="text-align: center;">
+                                <h4>NIRE SPA</h4>
+                                <h3>HOJA DE VIDA DEL ACTIVO FIJO Nro. {{hojaVida.codigo}}</h3>
+                                <div><strong>Al: {{hojaVida.fechaHoy}}</strong></div>
+                            </div>
+                            <div style="height: 15px;"></div>
+                            <p style="font-weight: bold;">INFORMACIÓN GENERAL</p>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Descripción:</strong></td>
+                                        <td>{{hojaVida.descripcion}}</td>
+                                        <td style="width: 200px;"><strong>Marca:</strong></td>
+                                        <td>{{hojaVida.marca}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Modelo:</strong></td>
+                                        <td>{{hojaVida.modelo}} </td>
+                                        <td style="width: 200px;"><strong>Serie:</strong></td>
+                                        <td>{{hojaVida.nro_serie}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estado:</strong></td>
+                                        <td colspan="3">{{hojaVida.estadoActivo}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Observaciones:</strong></td>
+                                        <td colspan="3">{{hojaVida.observacion}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <p style="font-weight: bold;">CLASIFICACIÓN Y CUSTODIO</p>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Custodio:</strong></td>
+                                        <td colspan="3">{{hojaVida.custodio}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Sucursal:</strong></td>
+                                        <td>{{hojaVida.sucursal}}</td>
+                                        <td style="width: 200px;"><strong>Ubicación física:</strong></td>
+                                        <td>{{hojaVida.ubicacion}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tipo de bien:</strong></td>
+                                        <td colspan="3">ACTIVO FIJO</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Categoría:</strong></td>
+                                        <td>{{hojaVida.categoria}}</td>
+                                        <td style="width: 200px;"><strong>Sub Categoría:</strong></td>
+                                        <td>{{hojaVida.subCategoria}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <p style="font-weight: bold;">INFORMACION DE COMPRA</p>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Nro. documento:</strong></td>
+                                        <td>{{hojaVida.comprobante}} {{hojaVida.nro_comprobante}}</td>
+                                        <td><strong>Fecha:</strong></td>
+                                        <td>{{hojaVida.fechaCompra}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Valor unitario:</strong></td>
+                                        <td>{{hojaVida.valorCompra}}</td>
+                                        <td style="width: 200px;"><strong>Descuento:</strong></td>
+                                        <td>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Valor neto:</strong></td>
+                                        <td>{{hojaVida.valorCompra}}</td>
+                                        <td style="width: 200px;"><strong>Meses garantía:</strong></td>
+                                        <td>{{hojaVida.vidaUtil}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Fecha inicio depreciación:</strong></td>
+                                        <td>{{hojaVida.fechaDepreciacion}}</td>
+                                        <td style="width: 200px;"><strong>Número ingreso:</strong></td>
+                                        <td>{{hojaVida.nroDocumento}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Proveedor:</strong></td>
+                                        <td colspan="3">{{hojaVida.proveedor}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <p style="font-weight: bold;">OTROS DATOS</p>
+                            <table bordered cTable small class="print-table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Cía Aseguradora:</strong></td>
+                                        <td>{{hojaVida.aseguradora}}</td>
+                                        <td><strong>Póliza:</strong></td>
+                                        <td>{{hojaVida.nroPoliza}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Fecha inicial:</strong></td>
+                                        <td>{{hojaVida.fechaIniSeguro}}</td>
+                                        <td style="width: 200px;"><strong>Fecha final:</strong></td>
+                                        <td>{{hojaVida.fechaFinSeguro}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 200px;"><strong>Monto:</strong></td>
+                                        <td colspan="3">{{hojaVida.montoSeguro}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 50px;"></div>
+                            <p style="font-weight: bold; text-align: center;">HISTORIAL DE MOVIMIENTOS</p>
+                            <table bordered cTable small class="print-table">
+                                <thead cTableColor="dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nro. Documento</th>
+                                        <th>Fecha</th>
+                                        <th>Custodio</th>
+                                        <th>Ubicación</th>
+                                        <th>Estado</th>
+                                        <th>Observación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   <tr *ngFor="let item of hojaVida.movimientos; index as i">
+                                        <td>{{ i + 1}}</td>
+                                        <td>{{item.nroDocumento}}</td>
+                                        <td>{{item.fechaAsignacion}}</td>
+                                        <td>{{item.custodio}}</td>
+                                        <td>{{item.area}}</td>
+                                        <td>{{item.estado}}</td>
+                                        <td>{{item.observacion}}</td>
+                                   </tr>
+                                </tbody>
+                            </table>
+                            <div style="height: 15px;"></div>
+                            <p style="font-weight: bold; text-align: center;">HISTORIAL DE MANTENIMIENTOS</p>
+                            <table bordered cTable small class="print-table">
+                                <thead cTableColor="dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Estado</th>
+                                        <th>Proveedor</th>
+                                        <th>Valor</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of hojaVida.mantenimientos; index as i">
+                                        <td>{{ i + 1}}</td>
+                                        <td>{{item.fechaMant}}</td>
+                                        <td>{{item.tipo}}</td>
+                                        <td>{{item.estado}}</td>
+                                        <td>{{item.proveedor}}</td>
+                                        <td>{{item.costo}}</td>
+                                        <td>{{item.observacion}}</td>
+                                   </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #vacio>
+                            <p>No existe HOJA DE VIDA</p>
+                        </ng-template>
+                    </ng-container>
+                </ng-container>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>

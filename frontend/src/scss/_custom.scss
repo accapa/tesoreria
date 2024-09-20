@@ -1,0 +1,152 @@
+// Sirve para ordenar ASC DESC en las tablas que tendan el atributo "sortable"
+th[sortable] {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none
+}
+
+th[sortable].desc:before,
+th[sortable].asc:before {
+    content: "";
+    display: block;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAmxJREFUeAHtmksrRVEUx72fH8CIGQNJkpGUUmakDEiZSJRIZsRQmCkTJRmZmJgQE0kpX0D5DJKJgff7v+ru2u3O3vvc67TOvsdatdrnnP1Y///v7HvvubdbUiIhBISAEBACQkAICAEhIAQ4CXSh2DnyDfmCPEG2Iv9F9MPlM/LHyAecdyMzHYNwR3fdNK/OH9HXl1UCozD24TCvILxizEDWIEzA0FcM8woCgRrJCoS5PIwrANQSMAJX1LEI9bqpQo4JYNFFKRSvIgsxHDVnqZgIkPnNBM0rIGtYk9YOOsqgbgepRCfdbmFtqhFkVEDVPjJp0+Z6e6hRHhqBKgg6ZDCvYBygVmUoEGoh5JTRvIJwhJo1aUOoh4CLPMyvxxi7EWOMgnCGsXXI1GIXlZUYX7ucU+kbR8NW8lh3O7cue0Pk32MKndfUxQFAwxdirk3fHappAnc0oqDPzDfGTBrCfHP04dM4oTV8cxr0SVzH9FF07xD3ib6xCDE+M+aUcVygtWzzbtGX2rPBrEUYfecfQkaFzYi6HjVnGBdtL7epqAlc1+jRdAap74RrnPc4BCijttY2tRcdN0g17w7HqZrXhdJTYAuS3hd8z+vKgK3V1zWPae0mZDMykadBn1hTQBLnZNwVrJpSe/NwEeDsEwCctEOsJTsgxLvCqUl2ACftEGvJDgjxrnBqkh3ASTvEWrIDQrwrnJpkB3DSDrGW7IAQ7wqnJtkBnLRztejXXVu4+mxz/nQ9jR1w5VB86ejLTFcnnDwhzV+F6T+CHZlx6THSjn76eyyBIOPHyDakhBAQAkJACAgBISAEhIAQYCLwC8JxpAmsEGt6AAAAAElFTkSuQmCC) no-repeat;
+    background-size: 22px;
+    width: 22px;
+    height: 22px;
+    float: left;
+    margin-left: -22px;
+}
+
+th[sortable].desc:before {
+    transform: rotate(180deg);
+    -ms-transform: rotate(180deg)
+}
+
+// Muestra botones flotantes en cada registro (edit, delete, etc)
+.destructive {
+    font-size: 11px;
+    text-align: right;
+}
+
+table {
+    tr {
+        &:hover,
+        &:focus {
+            td {
+                .destructive {
+                    display: block;
+                }
+            }
+        }
+        td {
+            position: relative;
+            .destructive {
+                position: absolute;
+                display: none;
+                right: 5px;
+                top: 2px;
+                margin: 0;
+                z-index: 100;
+            }
+        }
+    }
+}
+
+//Usado para el componente ng-select
+ng-select.ng-invalid.ng-touched .ng-select-container {
+    border-color: #dc3545;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px #fde6e8;
+}
+
+.custom-ng-select> .ng-select .ng-select-container {
+    background-color: #FFC000;
+    min-height: 28px;
+    height: 28px;
+}
+
+.custom-ng-select> .ng-select .ng-option {
+    background-color: #FFC000 !important;
+}
+
+.custom-ng-select> .ng-select .ng-dropdown-panel {
+    width: 400px !important; /* Ajusta el ancho según tus necesidades */
+}
+
+//ng-option ng-star-inserted ng-option-marked
+
+//Muestra los indicadores de slider (carousel de imagenes)
+.carousel-indicators {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin-right: 15%;
+    margin-bottom: 1rem;
+    margin-left: 15%;
+    list-style: none
+}
+
+//Usado para carousel
+.carousel-indicators [data-bs-target] {
+    box-sizing: content-box;
+    flex: 0 1 auto;
+    width: 30px;
+    height: 3px;
+    padding: 0;
+    margin-right: 3px;
+    margin-left: 3px;
+    text-indent: -999px;
+    cursor: pointer;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    opacity: .5;
+    transition: opacity .6s ease
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel-indicators [data-bs-target] {
+        transition: none
+    }
+}
+
+.carousel-indicators .active {
+    opacity: 1
+}
+
+//sirve para mostrar en el centro de una celda/tabla
+.centered-table th,
+.centered-table td {
+    vertical-align: middle;
+}
+
+//sirve para alinear a la derecha
+.align-right {
+    text-align: right;
+}
+
+//Para evitar salto de linea
+td[notAdjust] {
+    white-space: nowrap; //Evitar ajuste de línea 
+    overflow: hidden; //Ocultar el contenido que sobresale 
+    text-overflow: ellipsis; //Mostrar puntos suspensivos
+    max-width: 100px;
+}
+
+thead {
+    border-bottom: 1px solid black;
+}
+
+.search-form {
+    background-color: #EBEDEF;
+}
+
+.register-form {
+    background-color: #EBEDEF;
+}

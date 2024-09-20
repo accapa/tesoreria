@@ -1,0 +1,275 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Reporte de egresos</strong>
+            </c-card-header>
+            <c-card-body>
+                <button cButton (click)="toggleForm()" color="primary" size="sm">
+                    <svg cIcon class="me-1" name="cil-plus"></svg>Nuevo</button>
+
+                <button cButton (click)="toggleSearchForm()" color="primary" size="sm">
+                    <svg cIcon class="me-0" name="cil-search"></svg></button>
+
+                <div [visible]="showFormSearch" cCollapse>
+                    <c-card class="mt-3 shadow">
+                        <c-card-header>
+                            <strong>Buscar</strong>
+                        </c-card-header>
+                        <c-card-body class="search-form">
+                            <form cForm class="row g-3" [formGroup]="searchForm" novalidate (ngSubmit)="searchSubmit()">
+                                <c-col [md]="3">
+                                    <label cLabel>Grupo</label>
+                                    <ng-select [items]="grupos" bindLabel="descripcion" bindValue="idGrupo"
+                                        placeholder="Seleccionar" formControlName="idGrupo">
+                                    </ng-select>
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="fechaRegDesde">F. registro (desde)</label>
+                                    <input cFormControl id="fechaRegDesde" type="date"
+                                        formControlName="fechaRegDesde" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel for="fechaRegHasta">F. registro (hasta)</label>
+                                    <input cFormControl id="fechaRegHasta" type="date"
+                                        formControlName="fechaRegHasta" />
+                                </c-col>
+                                <c-col [md]="3">
+                                    <label cLabel>Estado</label>
+                                    <ng-select id="_estado" placeholder="Seleccionar" formControlName="estado">
+                                        <ng-option [value]="1">Activo</ng-option>
+                                        <ng-option [value]="2">Inactivo</ng-option>
+                                    </ng-select>
+                                </c-col>
+                                <c-col [xs]="12">
+                                    <button cButton type="submit" size="sm">
+                                        <svg cIcon class="me-1" name="cil-search"></svg>Buscar</button>
+                                    <button cButton type="button" (click)="onResetSearchForm()" color="secondary"
+                                        size="sm">
+                                        <svg cIcon class="me-1" name="cil-x-circle"></svg>Limpiar filtro</button>
+                                    <button cButton type="button" (click)="toggleSearchForm()" color="secondary"
+                                        size="sm">
+                                        <svg cIcon class="me-1" name="cil-x"></svg>Cerrar</button>
+                                </c-col>
+                            </form>
+                        </c-card-body>
+                    </c-card>
+                </div>
+                <hr />
+                <div style="padding-bottom: 5px; text-align: right;">
+                    <button cButton type="button" (click)="toExcel()" color="secondary" size="sm">
+                        <svg cIcon class="me-1" name="cil-spreadsheet"></svg>Excel</button>
+                </div>
+                <table bordered cTable [striped]="true" [hover]="true" small [responsive]="true">
+                    <thead cTableColor="dark">
+                        <tr>
+                            <th scope="col" sortable="idEgreso" (sort)="onSort($event)">#</th>
+                            <th scope="col" sortable="concepto" (sort)="onSort($event)">Concepto</th>
+                            <th scope="col" sortable="observacion" (sort)="onSort($event)">Descripción</th>
+                            <th scope="col" sortable="operacion" (sort)="onSort($event)">Nro.operación</th>
+                            <th scope="col" sortable="monto" (sort)="onSort($event)">Monto</th>
+                            <th scope="col" sortable="fechaComprobante" (sort)="onSort($event)">F.comprobante</th>
+                            <th scope="col" sortable="fechaRegistro" (sort)="onSort($event)">F. registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of asignaciones">
+                            <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
+                            <td>{{ item.concepto }}</td>
+                            <td style="width: 30%;">{{ item.observacion }}</td>
+                            <td><a href="#" (click)="listArchivos(item.idEgreso + ''); $event.preventDefault();">{{
+                                    item.operacion }}</a></td>
+                            <td class="align-right" style="width: 100px">{{ item.monto | number:'1.2-2'}}</td>
+                            <td width="100px">{{ item.fechaComprobante }}</td>
+                            <td width="100px">{{ item.fechaRegistro }}
+                                <div class="destructive">
+                                    <button cButton size="sm" (click)="getData(item)" color="primary">
+                                        <svg cIcon class="me-0" name="cil-pencil"></svg>
+                                    </button>
+                                    <button cButton size="sm" (click)="deleteData(item)" color="primary">
+                                        <svg cIcon class="me-0" name="cil-trash"></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="align-right"><strong>Total:</strong></td>
+                            <td class="align-right"><strong>{{totalMonto | number:'1.2-2'}}</strong></td>
+                            <td colspan="2" style="text-align: right;">{{totalItems}} registros</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <ngb-pagination (pageChange)="transition($event)" [(page)]="page" [collectionSize]="totalItems"
+                    [maxSize]="5" [pageSize]="itemsPerPage" [rotate]="true"></ngb-pagination>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>
+
+<c-modal #modalLg id="modalLg" [visible]="modalFormVisible" (visibleChange)="handleModalChange($event)"
+    backdrop="static">
+    <form cForm [formGroup]="egresoForm" novalidate (ngSubmit)="onSubmit()">
+        <c-modal-header>
+            <h5 cModalTitle>{{egresoForm.controls['idEgreso'].value ? 'Modificar' : 'Registrar'}} egreso</h5>
+            <button (click)="onResetAsignacionForm()" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body class="register-form">
+            <c-row>
+                <c-col md="12">
+
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col">Grupo</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['idGrupo'] as ctrl">
+                            <ng-select id="_id_sucursal" [items]="grupos" bindLabel="descripcion" bindValue="idGrupo"
+                                placeholder="Seleccionar" formControlName="idGrupo"
+                                [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}"
+                                (change)="onGrupoChange($event)">
+                            </ng-select>
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Seleccionar grupo
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col">Concepto</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['idConcepto'] as ctrl">
+                            <ng-select [items]="conceptos" bindLabel="concepto" bindValue="idConcepto"
+                                placeholder="Seleccionar" formControlName="idConcepto"
+                                [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
+                            </ng-select>
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Seleccionar Concepto
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="fechaComprobante">Fecha comprobante</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['fechaComprobante'] as ctrl">
+                            <input cFormControl id="fechaComprobante" type="date" formControlName="fechaComprobante"
+                                placeholder="Generado automáticamente por el sistema" autocomplete="off"
+                                [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Fecha comprobante es requerido</div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="operacion">Nro. de operación</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['operacion'] as ctrl">
+                            <input cFormControl id="operacion" type="text" formControlName="operacion"
+                                placeholder="Nro. de operación" autocomplete="off" required
+                                [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">Nro. operación es requerido</div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="monto">Monto</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['monto'] as ctrl">
+                            <input cFormControl id="monto" type="number" formControlName="monto" placeholder="Monto"
+                                autocomplete="off" required
+                                [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                            <c-form-feedback [valid]="!ctrl.invalid">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors.required">monto es requerido</div>
+                                    <div *ngIf="errors.pattern">
+                                        Ingrese datos numéricos
+                                    </div>
+                                    <div *ngIf="errors.max">
+                                        Superó la cantidad límite
+                                    </div>
+                                    <div *ngIf="errors.min">
+                                        Ingrese número mayor a "0"
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="observacion">Observaciones</label>
+                        <c-col [sm]="8" *ngIf="egresoForm.controls['observacion'] as ctrl">
+                            <textarea cFormControl id="observacion" rows="2" formControlName="observacion"
+                                autocomplete="off"
+                                [valid]="
+                          ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined"></textarea>
+                            <c-form-feedback *ngIf="ctrl.invalid" [valid]="!(ctrl.invalid)">
+                                <ng-container *ngIf="ctrl.errors as errors">
+                                    <div *ngIf="errors?.required">Condición es requerido</div>
+                                    <div *ngIf="ctrl.hasError('maxlength')">
+                                        Máximo de caracteres superados (500)
+                                    </div>
+                                </ng-container>
+                            </c-form-feedback>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col" for="imgProducto">Imagen del egreso</label>
+                        <c-col [sm]="8">
+                            <input cFormControl id="imgProducto" type="file" multiple (change)="onFileChange($event)"
+                                formControlName="imgsPago" />
+                        </c-col>
+                    </c-row>
+                    <div class="image-gallery">
+                        <div class="image-container" *ngFor="let image of selectedFilesProducto">
+                            <img [src]="image.previewUrl" alt="Image">
+                            <button cButtonClose type="button" (click)="deleteTmpImgPago(image)" class="delete-button"
+                                size="sm"></button>
+                        </div>
+                    </div>
+                </c-col>
+            </c-row>
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="egresoForm.invalid" [tabindex]="'0'" size="sm">
+                <svg cIcon class="me-1" name="cil-save"></svg>Guardar
+            </button>&nbsp;
+            <button cButton color="secondary" type="reset" (click)="onResetAsignacionForm()" [tabindex]="'1'" size="sm">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+
+<c-modal #modalImages id="modalImages" [visible]="modalFotoVisible" size="xl"
+    (visibleChange)="handleModalChangeImg($event)">
+    <c-modal-header>
+        <h5 cModalTitle>Imágenes del comprobante</h5>
+        <button (click)="handleModalChangeImg(false)" cButtonClose></button>
+    </c-modal-header>
+    <c-modal-body>
+        <div *ngIf="listImagenes.length  > 0; else arrayVacio">
+            <div style="height: 5px;"></div>
+            <ngb-carousel [interval]="0" (slid)="onSlide($event)">
+                <ng-template ngbSlide *ngFor="let slide of listImagenes" id="{{slide.idArchivo}}">
+                    <div class="picsum-img-wrapper" style="text-align: center; background-color: #919191;">
+                        <img [src]="resourceUrl + '/Archivo/showImage/' + slide.idArchivo" alt="Random first slide" />
+                    </div>
+                </ng-template>
+            </ngb-carousel>
+        </div>
+        <ng-template #arrayVacio>
+            <p>Sin imágenes</p>
+        </ng-template>
+    </c-modal-body>
+    <c-modal-footer>
+        <button cButton type="button" size="sm" (click)="deleteArchivo()"><svg cIcon class="me-1"
+                name="cil-trash"></svg>Eliminar imagen</button>
+        <button cButton color="secondary" type="reset" (click)="handleModalChangeImg(false)" [tabindex]="'0'">
+            <svg cIcon class="me-1" name="cil-x"></svg>Cerrar
+        </button>
+    </c-modal-footer>
+</c-modal>

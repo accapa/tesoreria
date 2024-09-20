@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIRESPA - RECIBO</title>
+    <style>
+        .boleta {
+            text-align: center;
+            padding: 3px;
+            font-size: 5pt;
+            font-family: sans-serif;
+            letter-spacing: 1px;
+            word-spacing: 2px;
+            width: 99.5%;
+            margin: 0px auto;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="boleta">
+        <p style="border-bottom: 1px dashed black;margin: 0px; padding: 10px 0px; padding-top:0px;">
+            Paola Carire Soras - NIRE SPA <br />
+            Av. Benavides N° 798 Lima - Cañete - San Vicente de Cañete <br />
+            Av. Benavides N° 798 <br />
+            RUC: 10459600990 <br />
+            Telef: 5813306
+        </p>
+
+        <p style="border-bottom: 1px dashed black;text-align:left;margin: 0px; padding: 4px 0px;">
+            Cliente: ${nombresCli}<br />
+            Documento: ${dniCli}
+        </p>
+
+        <p style="border-bottom: 1px dashed black;text-align:left;margin: 0px; padding: 4px 0px;">
+            Maq. Regis. Nro.: USAFIKA15100017<br/>
+            Ticket Nro.: ${idVenta}<br/>
+            <span style='float: right;'>Hora: ${hora}</span>Fecha: ${fecha}
+        </p>
+
+        ${servProd}
+
+        <p style="border-bottom: 1px dashed black;text-align:left;margin: 0px; padding: 4px 0px;display: inline-table; width: 100%;">
+            <span style='float: right;text-align: right;'>S/ ${pago}</span>
+            ****TOTAL<br/>****CAJERO: ${nombresUsuar}
+        </p>
+        <p style="border-bottom: 1px dashed black;text-align:left;margin: 0px; padding: 4px 0px;display: inline-table; width: 100%;">
+            <span style='float: right;text-align: right;'>S/ ${pagoTotal}</span>
+            VISA CREDITO<br/>
+            No. ${numeroVisa}<br/>
+            <br/>
+            <span style='float: right;text-align: right;'>S/ ${vuelto}</span>
+            Vuelto:
+        </p>
+        <p style="text-align:center;margin: 0px; padding: 4px 0px;display: block; width: 100%;">Gracias por su compra</p>
+    </main>
+</body>
+</html>
+
+
