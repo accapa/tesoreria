@@ -150,3 +150,8 @@ thead {
 .register-form {
     background-color: #EBEDEF;
 }
+
+tr.inactivo td {
+    background-color: #FFAAAA;
+    text-decoration:line-through;
+}

@@ -122,6 +122,7 @@ class PagoController extends Controller
                 $_pagoTotal -= $_deuda;
                 $deuda->montoRestante = $_pagoTotal >= 0 ? 0 : $_pagoTotal * -1;
                 $deuda->estadoDeuda = $_pagoTotal >= 0 ? EstadoDeuda::PAGADA->value : EstadoDeuda::PENDIENTE->value;
+                $deuda->fechaActualiza = date("Y-m-d H:i:s");
                 $deuda->save();
                 $_deudaTotal += $_deuda;
             }

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use PDOException;
 
 class EgresoController extends Controller {
-
+    private $filters = [];
     public function save()
     {
         $logger = Log::logMonolog();
@@ -86,12 +86,13 @@ class EgresoController extends Controller {
     public function listWithFilter()
     {
         $logger = Log::logMonolog();
+        $this->filters = $this->request;
         $page = $this->filters["page"] ?? 1;
         $perPage = $this->filters["size"] ?? SHOW_ROWS_GRID;
         $isToExcel = $this->filters["isToExcel"] ?? null; // flag que indica exportar a excel
         try {
             $mantenimiento = new Egreso();
-            $query = $mantenimiento->listWithFilter($this->request);
+            $query = $mantenimiento->listWithFilter($this->filters);
             if ($isToExcel) {
                // $this->toExcel($query->get()->toArray());
                 exit;
@@ -104,5 +105,4 @@ class EgresoController extends Controller {
             $logger->error($e->getMessage());
         }
     }
-
 }

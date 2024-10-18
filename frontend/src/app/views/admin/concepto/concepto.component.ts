@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmDialogService } from 'src/app/shared/confirm/confirm.app.service';
 import { BaseComponent } from '../../../shared/base/base.component';
@@ -12,6 +12,7 @@ import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/alumno.model';
 import { ToastService } from 'src/app/shared/toast/toast.service';
 import { TipoConcepto } from '../../../shared/base/tipo-concepto.enum';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-producto',
@@ -27,10 +28,13 @@ export class ConceptoComponent extends BaseComponent {
   tipos: any[] | null = null;
   conceptoForm!: FormGroup;
   searchForm!: FormGroup;
+  deudaForm!: FormGroup;
   showFormSearch = false;
   showFormAlumno = false;
   totalAlumnos = 0;
+  totalMontoDeuda = 0;
   public tipoConcepto = TipoConcepto;
+  private deudaValueChangesSub!: Subscription;
   constructor(
     public _spinner: NgxSpinnerService, route: ActivatedRoute,
     private conceptoService: ConceptoService,
@@ -46,9 +50,14 @@ export class ConceptoComponent extends BaseComponent {
     this.handleNavigation();
     this.createSearchForm();
     this.createCompraForm();
+    this.createDeudaForm();
+    this.deudaValueChangesSub = this.deudas.valueChanges.subscribe(() => this.calcularTotalMontoDeuda());
   }
 
   ngOnDestroy(): void {
+    if (this.deudaValueChangesSub) {
+      this.deudaValueChangesSub.unsubscribe();
+    }
   }
 
   private createCompraForm(): void {
@@ -64,6 +73,12 @@ export class ConceptoComponent extends BaseComponent {
     );
   }
 
+  private createDeudaForm(): void {
+    this.deudaForm = this.formBuilder.group({
+      deudas: this.formBuilder.array([])
+    });
+  }
+
   private createSearchForm(): void {
     this.searchForm = this.formBuilder.group(
       {
@@ -75,6 +90,7 @@ export class ConceptoComponent extends BaseComponent {
       }
     );
   }
+  
   private listTipoConcepto(): void {
     this.conceptoService.listTipoCombo().subscribe({
       next: (res: any) => {
@@ -82,7 +98,6 @@ export class ConceptoComponent extends BaseComponent {
       },
       error: e => {this.spinner.hide(); this.toastService.onError(e);}
     });
-
   }
   
   private listGrupo(): void {
@@ -94,7 +109,6 @@ export class ConceptoComponent extends BaseComponent {
     });
   }
 
-  //Abre ventana para registrar cliente
   public toggleForm(): void {
     this.modalFormVisible = !this.modalFormVisible;
     if (this.modalFormVisible)
@@ -156,7 +170,7 @@ export class ConceptoComponent extends BaseComponent {
     this.spinner.hide();
     this.toastService.addToast({ msg: 'Registrado con éxito.' });
     this.loadAll();
-    this.onResetMarcaForm(); //Cierra y resetea el formulario
+    this.onResetMarcaForm();
   }
 
   override deleting(row: any): void {
@@ -180,7 +194,7 @@ export class ConceptoComponent extends BaseComponent {
       next: (prod: Concepto) => {
         this.spinner.hide();
         this.modalFormVisible = !this.modalFormVisible;
-        this.conceptoForm.setValue(prod);
+        this.conceptoForm.patchValue(prod);
         this.loadCombos();
       },
       error: (e) => {this.spinner.hide(); this.toastService.onError(e);},
@@ -205,12 +219,29 @@ export class ConceptoComponent extends BaseComponent {
     }
   }
 
+  private initForm(): void {
+    const deudasArray = this.deudaForm.get('deudas') as FormArray;
+    deudasArray.clear()
+    this.alumnos?.forEach(alumno => {
+      const deudaForm = this.formBuilder.group({
+        montoDeuda: [ (this.concepto?.monto || 0) / this.totalAlumnos],
+        idAlumno: [alumno.idAlumno]
+      });
+      deudasArray.push(deudaForm);
+    });
+  }
+
+  get deudas(): FormArray {
+    return this.deudaForm.get('deudas') as FormArray;
+  }
+
   private listAlumnoDeuda(idConcepto: number) {
     this.showFormAlumno = true;
     this.categoriaService.listAlumnoByConcepto(idConcepto).subscribe({
       next: (alumnos: any) => {
         this.alumnos = alumnos;
-        this.totalAlumnos = alumnos.length
+        this.totalAlumnos = alumnos.length;
+        this.initForm();
       },
       error: e => {this.spinner.hide(); this.toastService.onError(e);}
     });
@@ -269,6 +300,7 @@ export class ConceptoComponent extends BaseComponent {
           this.toastService.addToast({ title: 'Alerta', color: 'warning', msg: 'Seleccione concepto' });
           return
         }
+        this.concepto.deudas = this.deudaForm.getRawValue().deudas;
         this.conceptoService.generarDeuda(this.concepto).subscribe({
           next: () => {
             this.spinner.hide();
@@ -280,5 +312,11 @@ export class ConceptoComponent extends BaseComponent {
         });
       })
       .catch(() => console.log('cancelado...'));
+  }
+
+  private calcularTotalMontoDeuda(): void {
+    this.totalMontoDeuda = this.deudas.controls.reduce((acc, deuda) => {
+      return acc + deuda.get('montoDeuda')?.value || 0;
+    }, 0);
   }
 }

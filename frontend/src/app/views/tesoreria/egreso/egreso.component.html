@@ -73,7 +73,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let item of asignaciones">
+                        <tr *ngFor="let item of egresos">
                             <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
                             <td>{{ item.concepto }}</td>
                             <td style="width: 30%;">{{ item.observacion }}</td>
@@ -95,9 +95,14 @@
                     </tbody>
                     <tfoot>
                         <tr>
+                            <td colspan="4" class="align-right"><strong>Sub total:</strong></td>
+                            <td class="align-right"><strong>{{subTotalMonto | number:'1.2-2'}}</strong></td>
+                            <td colspan="2" style="text-align: right;">{{totalItems}} registros</td>
+                        </tr>
+                        <tr>
                             <td colspan="4" class="align-right"><strong>Total:</strong></td>
                             <td class="align-right"><strong>{{totalMonto | number:'1.2-2'}}</strong></td>
-                            <td colspan="2" style="text-align: right;">{{totalItems}} registros</td>
+                            <td colspan="2"></td>
                         </tr>
                     </tfoot>
                 </table>

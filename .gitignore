@@ -5,6 +5,10 @@
 /tmp
 /out-tsc
 /bazel-out
+/vendor/
+frontend/node_modules/
+frontend/.angular/
+frontend/dist
 
 # Node
 /node_modules

@@ -16,4 +16,9 @@ enum Estado: string
     {
         return strtolower($this->name);
     }
+
+    public static function list(): array
+    {
+        return array_map(fn($case) => ['value' => $case->value, 'label' => $case->name], self::cases());
+    }
 }

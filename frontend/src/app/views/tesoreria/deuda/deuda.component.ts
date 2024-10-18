@@ -18,6 +18,8 @@ import { ArchivoService } from '../../archivo/archivo.service';
 import { AlumnoService } from '../../admin/alumno/alumno.service';
 import { Alumno } from '../../admin/alumno/alumno.model';
 import { EstadoDeuda } from 'src/app/shared/base/estado-deuda.enum';
+import { Concepto } from '../../admin/concepto/concepto.model';
+import { ConceptoService } from '../../admin/concepto/concepto.service';
 
 @Component({
   selector: 'app-af-compra',
@@ -27,12 +29,16 @@ import { EstadoDeuda } from 'src/app/shared/base/estado-deuda.enum';
 export class DeudaComponent extends BaseComponent {
   resourceUrl: string = ''
   pagoForm!: FormGroup;
+  deudaForm!: FormGroup;
   searchForm!: FormGroup;
   alumno!: Alumno;
   modalFormActivoVisible = false;
   modalFotoVisible = false;
+  modalDeudaVisible = false;
   deudas: Deuda[] | null = null;
   saldos: Saldo[] | null = null;
+  estadoDeudas: any[] | null = null;
+  conceptos: Concepto[] | null = null;
   selectedFilesProducto: SelectedFile[] = [];
   listImagenes: any[] = [];
   str_id_archivo: string = '';
@@ -58,6 +64,7 @@ export class DeudaComponent extends BaseComponent {
     private archivoService: ArchivoService,
     private alumnoService: AlumnoService,
     private saldoService: SaldoService,
+    private conceptoService: ConceptoService,
   ) {
     super(_spinner, route, confirService);
   }
@@ -65,6 +72,7 @@ export class DeudaComponent extends BaseComponent {
   ngOnInit(): void {
     this.resourceUrl = this.pagoService.resourceUrl;
     this.createCompraForm();
+    this.createDeudaForm();
   }
 
   ngAfterContentInit() {
@@ -80,6 +88,19 @@ export class DeudaComponent extends BaseComponent {
         this.toastService.addToast({ title: 'Alerta', color: 'warning', msg: 'El parámetro enviado no es numérico' });
       }
     });
+  }
+
+  private createDeudaForm(): void {
+    this.deudaForm = this.formBuilder.group(
+      {
+        idDeuda: [null],
+        idAlumno: [null, [Validators.required]],
+        idConcepto: [null, [Validators.required]],
+        monto: [null, [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.max(9999), Validators.min(0)]],
+        montoRestante: [null, [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.max(9999), Validators.min(0)]],
+        estadoDeuda: [null, [Validators.required]],
+      }
+    );
   }
 
   private createCompraForm(): void {
@@ -178,6 +199,10 @@ export class DeudaComponent extends BaseComponent {
     this.modalFormActivoVisible = event;
   }
 
+  public handleModalDeudaChange(event: boolean) {
+    this.modalDeudaVisible = event;
+  }
+
   public onResetActivoForm() {
     this.pagoForm.reset();
     this.toggleFormActivo();
@@ -185,6 +210,11 @@ export class DeudaComponent extends BaseComponent {
     this.totalSaldo = this.saldos?.reduce((sum, sal) => sum + sal.monto, 0) || 0;
     this.aplicarSaldo = false;
     this.readOnlyMonto = false;
+  }
+
+  public onResetDeudaForm() {
+    this.deudaForm.reset();
+    this.modalDeudaVisible = false;
   }
 
   public onPagoSubmit() {
@@ -316,5 +346,52 @@ export class DeudaComponent extends BaseComponent {
       this.readOnlyMonto = false;
     }
     this.pagoForm.patchValue({monto: this.aplicarSaldo ? _monto : null, aplicarSaldo: this.aplicarSaldo});
+  }
+
+  public openDeuda():void {
+    if (this.selectedDeudaItems.size === 0) {
+      this.toastService.addToast({ title: 'Aviso', color: 'warning', msg: 'Seleccione deuda' });
+      return;
+    }
+    const idDeuda = this.selectedDeudaItems.values().next().value;
+    this.deudaService.find(idDeuda).subscribe({
+      next: (deuda: Deuda) => {
+        this.deudaForm.patchValue(deuda);
+        this.modalDeudaVisible = true;
+      },
+      error: e => {this.spinner.hide(); this.toastService.onError(e);}
+    });
+    this.listConcepto();
+    this.listEstadoDeuda();
+  }
+
+  public onDeudaSubmit(): void {
+    this.spinner.show();
+    this.deudaService.save(this.deudaForm.getRawValue()).subscribe({
+      next: () => {
+        this.onResetDeudaForm();
+        this.spinner.hide();
+        this.getParamId();
+      },
+      error: e => {this.spinner.hide(); this.toastService.onError(e);}
+    });
+  }
+
+  private listEstadoDeuda(): void {
+    this.deudaService.listEstadoDeuda().subscribe({
+      next: (res: any) => {
+        this.estadoDeudas = res;
+      },
+      error: e => {this.spinner.hide(); this.toastService.onError(e);}
+    });
+  }
+
+  private listConcepto(): void {
+    this.conceptoService.listConceptoByGrupo(this.alumno.idGrupo || 0).subscribe({
+      next: (res: any) => {
+        this.conceptos = res;
+      },
+      error: e => {this.spinner.hide(); this.toastService.onError(e);}
+    });
   }
 }

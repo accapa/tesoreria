@@ -85,20 +85,12 @@ export class ExcelComponent extends BaseComponent {
     this.modalGarantiaVisible = false;
   }
 
-  public handleModalChange(event: boolean) {
-    this.modalDepreciacionVisible = event;
-    if (!this.modalDepreciacionVisible) {
-      this.depreciacionForm.reset();
-    } else {
-      this.listCategoria();
-    }
+  public alumnoConcepto() {
+    this.router.navigate([`/tesoreria/reportes/alumno-concepto`]);
   }
 
-  public handleModalMantChange(event: boolean) {
-    this.modalMantVisible = event;
-    if (!this.modalMantVisible) {
-      this.mantenimientoForm.reset();
-    }
+  public balanceGrupo() {
+    this.router.navigate([`/tesoreria/reportes/balance-grupo`]);
   }
 
   public handleModalGarantiaChange(event: boolean) {

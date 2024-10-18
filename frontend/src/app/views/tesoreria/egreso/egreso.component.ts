@@ -23,7 +23,7 @@ import { ArchivoService } from '../../archivo/archivo.service';
 export class EgresoComponent extends BaseComponent {
   resourceUrl: string = ''
   modalFormVisible: boolean = false;
-  asignaciones: Egreso[] | null = null;
+  egresos: Egreso[] | null = null;
   grupos: Grupo[] | null = null;
   conceptos: Concepto[] | null = null;
   activos: Pago[] | null = null;
@@ -40,6 +40,7 @@ export class EgresoComponent extends BaseComponent {
   modalFotoVisible: boolean = false;
   listImagenes: any[] = [];
   strIdArchivo = '';
+  subTotalMonto = 0;
   totalMonto = 0;
   constructor(
     private confDiService: ConfirmDialogService, route: ActivatedRoute, private router: Router,
@@ -146,8 +147,9 @@ export class EgresoComponent extends BaseComponent {
           this.totalItems = res.body.total;
           this.page = res.body.current_page;
           this.itemsPerPage = res.body.per_page;
-          this.asignaciones = res.body?.data;
-          this.totalMonto = this.asignaciones?.reduce((total, dato) => total + dato.monto, 0) ?? 0;
+          this.egresos = res.body.data;
+          this.subTotalMonto = this.egresos?.reduce((total, dato) => total + dato.monto, 0) ?? 0;
+          this.totalMonto =  this.egresos && this.egresos.length > 0 ? this.egresos[0].totalMonto : 0
         },
         error: (e) => { this.spinner.hide(); this.toastService.onError(e); },
       });

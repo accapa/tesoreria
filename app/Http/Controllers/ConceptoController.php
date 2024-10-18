@@ -173,17 +173,13 @@ class ConceptoController extends Controller
         $logger = Log::logMonolog();
         try {
             $concepto = $this->request;
-            $alumno = new Alumno();
-            $query = $alumno->listWithFilter(["idGrupo" => $concepto["idGrupo"], "estado" => Estado::ACTIVO->value]);
-            $alumnos = $query->get()->toArray();
             DB::beginTransaction();
-            foreach ($alumnos as $alum) {
+            foreach (($concepto["deudas"] ?? []) as $row) {
                 $deuda = new Deuda();
-                $deuda->idAlumno = $alum->idAlumno;
+                $deuda->idAlumno = $row["idAlumno"];
                 $deuda->idConcepto = $concepto["idConcepto"];
-                $deuda->monto = $concepto["monto"] / count($alumnos) ?? 1;
+                $deuda->monto = $row["montoDeuda"] ?? 0;
                 $deuda->save();
-                $logger->debug("row: ", [["totalAlums" => count($alumnos), "unidad" => $concepto["monto"] ?? 1]]);
             }
             $concpto = Concepto::find($concepto["idConcepto"]);
             $concpto->fechaGenera = date("Y-m-d H:i:s");

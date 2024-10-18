@@ -80,10 +80,13 @@
                         <tr *ngFor="let item of conceptos">
                             <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
                             <td notAdjust>{{ item.grupoDescripcion }}</td>
-                            <td style="width: 100px; font-size: 12px;"><strong [style]="item.tipo === 'EGRESO' ? 'color: red;': 'color: green;'">{{ item.tipo }}</strong></td>
+                            <td style="width: 100px; font-size: 12px;"><strong
+                                    [style]="item.tipo === 'EGRESO' ? 'color: red;': 'color: green;'">{{ item.tipo
+                                    }}</strong></td>
                             <td>{{ item.concepto }}</td>
                             <td class="align-right" style="width: 150px;">{{ item.monto | number:'1.2-2'}}
-                                <svg cIcon [class]="item.fechaGenera ? 'me-0 text-success' : 'me-0 text-danger'" [name]="item.fechaGenera ? 'cil-check': 'cil-av-timer'"></svg>
+                                <svg cIcon [class]="item.fechaGenera ? 'me-0 text-success' : 'me-0 text-danger'"
+                                    [name]="item.fechaGenera ? 'cil-check': 'cil-av-timer'"></svg>
                             </td>
                             <td><span *ngIf="item.estado">{{ estadoReg(item.estado) }}</span></td>
                             <td style="width: 100px;">{{ item.fechaGenera }}</td>
@@ -129,8 +132,8 @@
                     <c-row class="mb-1">
                         <label cCol [sm]="4" cLabel="col">Grupo</label>
                         <c-col [sm]="8" *ngIf="conceptoForm.controls['idGrupo'] as ctrl">
-                            <ng-select id="_id_sucursal" [items]="grupos" bindLabel="descripcion"
-                                bindValue="idGrupo" placeholder="Seleccionar" formControlName="idGrupo"
+                            <ng-select id="_id_sucursal" [items]="grupos" bindLabel="descripcion" bindValue="idGrupo"
+                                placeholder="Seleccionar" formControlName="idGrupo"
                                 [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
                             </ng-select>
                             <c-form-feedback [valid]="!ctrl.invalid">
@@ -195,7 +198,7 @@
                             <ng-select placeholder="Seleccionar" formControlName="estado"
                                 [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
                                 <ng-option value="1">Activo</ng-option>
-                                <ng-option value="2">Inactivo</ng-option>
+                                <ng-option value="0">Inactivo</ng-option>
                             </ng-select>
                             <c-form-feedback [valid]="!ctrl.invalid">
                                 <ng-container *ngIf="ctrl.errors as errors">
@@ -228,56 +231,61 @@
 
 <c-modal #modalAlumnoLg id="modalAlumnoLg" [visible]="showFormAlumno" (visibleChange)="handleModalChangeAlum($event)"
     backdrop="static" size="lg">
-    <c-modal-header>
-        <h5 cModalTitle>Generar deuda</h5>
-        <button (click)="handleModalChangeAlum(false)" cButtonClose></button>
-    </c-modal-header>
-    <c-modal-body>
-        <table>
-            <tr>
-                <td><b>Concepto</b></td>
-                <td>:</td>
-                <td>{{concepto?.concepto}}</td>
-            </tr>
-            <tr>
-                <td><b>Monto total</b></td>
-                <td>:</td>
-                <td>{{concepto?.monto}}</td>
-            </tr>
-        </table>
-        <table bordered cTable [striped]="true" [hover]="true" small [responsive]="true">
-            <thead cTableColor="dark">
+    <form cForm [formGroup]="deudaForm" novalidate (ngSubmit)="generarDeuda()">
+        <c-modal-header>
+            <h5 cModalTitle>Generar deuda</h5>
+            <button (click)="handleModalChangeAlum(false)" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body>
+            <table>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">DNI</th>
-                    <th scope="col">Apellidos y nombres</th>
-                    <th scope="col">Deuda a generar</th>
+                    <td><b>Concepto</b></td>
+                    <td>:</td>
+                    <td>{{concepto?.concepto}}</td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of alumnos">
-                    <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
-                    <td style="width: 100px;">{{ item.dni }}</td>
-                    <td>{{ item.apellidos }} {{ item.nombres }}</td>
-                    <td class="align-right" style="width: 150px;">{{ ((concepto?.monto ?? 0) / totalAlumnos) |
-                        number:'1.2-2'}}</td>
-                </tr>
-            </tbody>
-            <tfoot>
                 <tr>
-                    <td colspan="3" style="text-align: right;">Total:</td>
-                    <td class="align-right"><strong>S/ {{concepto?.monto | number:'1.2-2'}}</strong></td>
+                    <td><b>Monto total</b></td>
+                    <td>:</td>
+                    <td>S/ {{concepto?.monto | number:'1.2-2'}}</td>
                 </tr>
-            </tfoot>
-        </table>
-
-    </c-modal-body>
-    <c-modal-footer>
-        <button cButton color="primary" type="button" (click)="generarDeuda()">
-            <svg cIcon class="me-1" name="cil-save"></svg>Generar deuda
-        </button>
-        <button cButton color="secondary" type="reset" (click)="handleModalChangeAlum(false)">
-            <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
-        </button>
-    </c-modal-footer>
+            </table>
+            <div formArrayName="deudas">
+                <table bordered cTable [striped]="true" [hover]="true" small [responsive]="true">
+                    <thead cTableColor="dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">DNI</th>
+                            <th scope="col">Apellidos y nombres</th>
+                            <th scope="col">Deuda a generar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of alumnos; index as i" [formGroupName]="i">
+                            <th scope="row" style="width: 50px;">{{ i + 1 }}</th>
+                            <td style="width: 100px;">{{ item.dni }}</td>
+                            <td>{{ item.apellidos }} {{ item.nombres }}</td>
+                            <td class="align-right" style="width: 150px;">
+                                <input type="number" formControlName="montoDeuda" placeholder="Ingrese monto de deuda" class="align-right"/>
+                                <input type="hidden" formControlName="idAlumno"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right;">Total:</td>
+                            <td class="align-right"><strong>S/ {{totalMontoDeuda | number:'1.2-2'}}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="deudaForm.invalid">
+                <svg cIcon class="me-1" name="cil-save"></svg>Generar deuda
+            </button>
+            <button cButton color="secondary" type="reset" (click)="handleModalChangeAlum(false)">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
 </c-modal>

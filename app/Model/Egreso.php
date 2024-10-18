@@ -25,6 +25,7 @@ class Egreso extends Model
             "e.monto",
             DB::raw("DATE_FORMAT(e.fechaComprobante, '%d/%m/%Y') AS fechaComprobante"),
             DB::raw("DATE_FORMAT(e.fechaRegistro, '%d/%m/%Y') AS fechaRegistro"),
+            DB::raw("SUM(e.monto) OVER () as totalMonto"),
         )->leftJoin('concepto as c', 'c.idConcepto', '=', 'e.idConcepto')
         
             ->when(!empty($this->filters["idGrupo"] ?? ""), function ($query) {

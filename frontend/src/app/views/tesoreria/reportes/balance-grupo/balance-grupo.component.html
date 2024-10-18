@@ -1,0 +1,64 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Balance por grupo</strong>
+            </c-card-header>
+            <c-card-body>
+                <c-card class="mt-3 shadow">
+                    <c-card-header>
+                        <strong>Buscar</strong>
+                    </c-card-header>
+                    <c-card-body class="search-form">
+                        <form cForm class="row g-3" [formGroup]="searchForm" novalidate (ngSubmit)="searchSubmit()">
+                            <c-col [md]="3">
+                                <label cLabel>Grupo</label>
+                                <ng-select [items]="grupos" bindLabel="descripcion" bindValue="idGrupo"
+                                    placeholder="Seleccionar" formControlName="idGrupo">
+                                </ng-select>
+                            </c-col>
+                            <c-col [xs]="12">
+                                <button cButton type="submit" size="sm">
+                                    <svg cIcon class="me-1" name="cil-search"></svg>Buscar</button>
+                                <button cButton type="button" (click)="onResetSearchForm()" color="secondary" size="sm">
+                                    <svg cIcon class="me-1" name="cil-x-circle"></svg>Limpiar filtro</button>
+                            </c-col>
+                        </form>
+                    </c-card-body>
+                </c-card>
+                <hr />
+
+                <table bordered cTable [hover]="true" small [responsive]="true" class="centered-table">
+                    <thead cTableColor="dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let item of balances; index as i">
+                            <tr style="background-color: #EAEAEA">
+                                <td style="width: 40px;">{{ i + 1 }}</td>
+                                <td style="font-weight: bold;">{{ item.concepto }}</td>
+                                <td class="align-right" style="width: 150px; font-weight: bold; color: green;">{{ item.total | number:'1.2-2'}}</td>
+                            </tr>
+                            <tr *ngFor="let egreso of item.egresos; index as j">
+                                <td>{{ j + 1 }}</td>
+                                <td>&nbsp;&nbsp;{{ egreso.observacion }}</td>
+                                <td class="align-right" style="color: red; font-weight: bold;">{{ egreso.monto * -1 | number:'1.2-2'}}</td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                    <tfoot cTableColor="dark">
+                        <tr style="background-color: #ccc">
+                            <td colspan="2" class="align-right"><strong>SALDO</strong></td>
+                            <td class="align-right"><strong style="font-size: 20px;" [style]="total > 0 ? 'color: white;' : 'color: red;'">S/ {{total | number:'1.2-2'}}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>

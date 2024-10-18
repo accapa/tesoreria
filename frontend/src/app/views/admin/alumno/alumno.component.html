@@ -76,8 +76,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let item of alumnos">
-                            <th scope="row" style="width: 50px;">{{ item.row_num }}</th>
+                        <tr [ngClass]="{'inactivo': !isActive(item.estado)}" *ngFor="let item of alumnos">
+                            <td style="width: 50px;">{{ item.row_num }}</td>
                             <td>{{ item.grupoDescripcion }}</td>
                             <td style="width: 100px;">{{ item.dni }}</td>
                             <td>{{ item.apellidos }} {{ item.nombres }}</td>

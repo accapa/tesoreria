@@ -1,0 +1,110 @@
+<c-row ngPreserveWhitespaces class="justify-content-between">
+    <c-col xs="12">
+        <c-card class="mb-4">
+            <c-card-header>
+                <strong>Alumnos por categoria</strong>
+            </c-card-header>
+            <c-card-body>
+                <c-card class="mt-3 shadow">
+                    <c-card-header>
+                        <strong>Buscar</strong>
+                    </c-card-header>
+                    <c-card-body class="search-form">
+                        <form cForm class="row g-3" [formGroup]="searchForm" novalidate (ngSubmit)="searchSubmit()">
+                            <c-col [md]="3">
+                                <label cLabel>Grupo</label>
+                                <ng-select [items]="grupos" bindLabel="descripcion" bindValue="idGrupo"
+                                    placeholder="Seleccionar" formControlName="idGrupo">
+                                </ng-select>
+                            </c-col>
+
+                            <c-col [md]="3">
+                                <label cLabel="col">Estado</label>
+                                <ng-select [items]="estados" bindLabel="label" bindValue="value"
+                                    placeholder="Seleccionar" formControlName="estados" [multiple]="true"
+                                    [closeOnSelect]="false">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="item-{{index}}" type="checkbox" [checked]="item$.selected" />
+                                        {{item.label}}
+                                    </ng-template>
+                                    <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                                        <div class="ng-value" *ngFor="let row of items | slice:0:5">
+                                            <span class="ng-value-icon left" (click)="clear(row)"
+                                                aria-hidden="true">×</span>
+                                            <span class="ng-value-label">{{ngSelectGetDataFromOption(row)}}</span>
+                                        </div>
+                                        <div class="ng-value" *ngIf="items.length > 3">
+                                            <span class="ng-value-label">{{items.length - 5}} más...</span>
+                                        </div>
+                                    </ng-template>
+                                </ng-select>
+                            </c-col>
+
+                            <c-col [xs]="12">
+                                <button cButton type="submit" size="sm">
+                                    <svg cIcon class="me-1" name="cil-search"></svg>Buscar</button>
+                                <button cButton type="button" (click)="onResetSearchForm()" color="secondary" size="sm">
+                                    <svg cIcon class="me-1" name="cil-x-circle"></svg>Limpiar filtro</button>
+                            </c-col>
+                        </form>
+                    </c-card-body>
+                </c-card>
+                <hr />
+
+                <table bordered cTable [striped]="true" [hover]="true" small [responsive]="true" class="centered-table">
+                    <thead cTableColor="dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Apellidos y nombres</th>
+                            <ng-container *ngFor="let col of getColumnas(); index as i">
+                                <th>{{heads[i]}}</th>
+                            </ng-container>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let item of alumnoCat; index as i">
+                            <tr [ngClass]="{'inactivo': !isActive(item.estado)}">
+                                <td style="width: 40px;">{{ i + 1 }}</td>
+                                <td style="width: 35%;">{{ item.nombreAlumno }}</td>
+                                <ng-container *ngFor="let col of getColumnas()">
+                                    <td class="align-right" style="width: 150px;">
+                                        <span *ngIf="item['monto_' + col] > 0"
+                                            [style]="item['estadoDeuda_' + col] === getPagado() ? 'color: green;': 'color: red;'"
+                                            style="font-weight: bold;"
+                                            [title]="item['montoRestante_' + col] > 0 ? 'de ' + item['monto_' + col] : ''">
+                                            {{(item['montoRestante_' + col] > 0 ? item['montoRestante_' + col] :
+                                            item['monto_' + col]) | number:'1.2-2'}}
+                                        </span>
+
+                                        <c-progress
+                                            *ngIf="item['montoRestante_' + col] === 0 && item['monto_' + col] > 0">
+                                            <c-progress-bar
+                                                [value]="item['estadoDeuda_' + col] === getPagado() ? 100 : 0"
+                                                color="success">
+                                                <span style="color: black;">{{item['estadoDeuda_' + col] === getPagado()
+                                                    ?
+                                                    100 : 0}}%</span>
+                                            </c-progress-bar>
+                                        </c-progress>
+                                        <c-progress *ngIf="item['montoRestante_' + col] > 0">
+                                            <c-progress-bar
+                                                [value]="getPorcentage(item['monto_' + col], item['montoRestante_' + col])"
+                                                [color]="item['estadoDeuda_' + col] === getPagado() ? 'success' : 'danger'">
+                                                <span style="color: black;">{{getPorcentage(item['monto_' + col],
+                                                    item['montoRestante_' + col]) | number:'1.0-0'}}%</span>
+                                            </c-progress-bar>
+                                        </c-progress>
+                                    </td>
+                                </ng-container>
+                                <td class="align-right" style="font-weight: bold; width: 100px;">{{ item.saldo |
+                                    number:'1.2-2'}}</td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>

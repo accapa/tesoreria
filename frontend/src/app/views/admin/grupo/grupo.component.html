@@ -105,7 +105,7 @@
                         <c-col [sm]="8" *ngIf="grupoForm.controls['estado'] as ctrl">
                             <ng-select placeholder="Seleccionar" formControlName="estado" [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
                                 <ng-option value="1">Activo</ng-option>
-                                <ng-option value="2">Inactivo</ng-option>
+                                <ng-option value="0">Inactivo</ng-option>
                             </ng-select>
                             <c-form-feedback [valid]="!ctrl.invalid">
                                 <ng-container *ngIf="ctrl.errors as errors">

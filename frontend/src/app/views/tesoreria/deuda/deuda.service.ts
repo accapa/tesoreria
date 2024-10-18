@@ -12,8 +12,8 @@ export class DeudaService {
   private resourceUrl = this.applicationConfigService.getEndpointFor(environment.apiBaseUrl);
   constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) { }
 
-  save(compra: IDeuda): Observable<IDeuda> {
-    return this.http.post<IDeuda>(`${this.resourceUrl}/activosFijos/Compra/save`, compra);
+  save(deuda: IDeuda): Observable<IDeuda> {
+    return this.http.post<IDeuda>(`${this.resourceUrl}/Deuda/save`, deuda);
   }
 
   find(id: number): Observable<IDeuda> {
@@ -21,19 +21,19 @@ export class DeudaService {
   }
 
   delete(id: string): Observable<{}> {
-    return this.http.delete(`${this.resourceUrl}/activosFijos/Compra/delete/${id}`);
+    return this.http.delete(`${this.resourceUrl}/Deuda/delete/${id}`);
   }
-
-  listTipoComprobanteCombo(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.resourceUrl}/activosFijos/Compra/listTipoComprobanteCombo`);
-  }
-
+  
   downloadExcel(req?: Pagination): Observable<any>  {
     const options = createRequestOption(req);
-    return this.http.get(`${this.resourceUrl}/activosFijos/Compra/listWithFilter`, { params: options, responseType: 'arraybuffer'})
+    return this.http.get(`${this.resourceUrl}/Deuda/listWithFilter`, { params: options, responseType: 'arraybuffer'})
   }
 
   listDeudaByIdAlumno(idAlumno: number): Observable<IDeuda[]> {
     return this.http.get<IDeuda[]>(`${this.resourceUrl}/Deuda/listDeudaByIdAlumno/${idAlumno}`);
+  }
+
+  listEstadoDeuda(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.resourceUrl}/Deuda/listEstadoDeuda`);
   }
 }

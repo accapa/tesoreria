@@ -7,9 +7,11 @@ import { PagoComponent } from './pago/pago.component';
 import { ActaComponent } from './reportes/acta/acta.component';
 import { DeudaListComponent } from './deuda-list/deuda-list.component';
 import { ExcelComponent } from './reportes/export-excel/excel.component';
+import { AlumnoConceptoComponent } from './reportes/alumno-concepto/alumno-concepto.component';
+import { BalanceGrupoComponent } from './reportes/balance-grupo/balance-grupo.component';
 
 import { ActivoFijoRoutingModule } from './tesoreria-routing.module';
-import { CardModule, GridModule, ButtonModule, TableModule, ModalModule, FormModule, CollapseModule, NavModule, AlertModule  } from '@coreui/angular';
+import { CardModule, GridModule, ButtonModule, TableModule, ModalModule, FormModule, CollapseModule, NavModule, AlertModule, ProgressModule  } from '@coreui/angular';
 import { IconModule } from '@coreui/icons-angular';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdSortableHeader } from '../../shared/sort/NgbdSortableHeader';
@@ -22,7 +24,7 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
   declarations: [
     DeudaComponent,
     PagoComponent,
-    EgresoComponent, ActaComponent, ExcelComponent, DeudaListComponent
+    EgresoComponent, ActaComponent, ExcelComponent, DeudaListComponent, AlumnoConceptoComponent, BalanceGrupoComponent
   ],
   imports: [FormsModule,
     CommonModule,
@@ -38,7 +40,7 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
     FormModule,
     CollapseModule,
     NavModule,
-    AlertModule,
+    AlertModule, ProgressModule,
     NgSelectModule,
     ReactiveFormsModule,
     NgbCarouselModule

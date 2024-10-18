@@ -139,7 +139,7 @@ class AlumnoController extends Controller
         }
         $alumno = new Alumno();
         $alumnos = $alumno->listWithFilter($filters)->get()->toArray();
-        $list = array_map(function($persona) {
+        $list = array_map(function ($persona) {
             return ["idAlumno" => $persona->idAlumno, "nombres" => $persona->apellidos . " " . $persona->nombres];
         }, $alumnos);
         echo json_encode($list);
@@ -162,10 +162,11 @@ class AlumnoController extends Controller
     public function listAlumnoByConcepto(int $idConcepto)
     {
         try {
-            $this->filters = $this->request;
+
             $concepto = Concepto::find($idConcepto);
             $alumno = new Alumno();
-            $query = $alumno->listWithFilter(["idGrupo" => $concepto->idGrupo, "estado" => Estado::ACTIVO->value]);
+            $query = $alumno->listWithFilter(["idGrupo" => $concepto->idGrupo, "estado" => Estado::ACTIVO->value, "sort" => "s.apellidos,asc"]);
+            $query->orderBy('s.nombres', 'asc');
             echo json_encode($query->get()->toArray());
         } catch (ModelNotFoundException $e) {
             header("HTTP/1.0 404 " . $e->getMessage());

@@ -9,6 +9,7 @@ export interface IEgreso extends ModelBase {
   operacion: string | null;
   monto: number;
   fechaComprobante: string | null;
+  totalMonto: number | 0;
 }
 
 export class Egreso implements IEgreso {
@@ -19,6 +20,7 @@ export class Egreso implements IEgreso {
     public operacion: string | null,
     public monto: number,
     public fechaComprobante: string | null,
+    public totalMonto: number | 0,
 
     public row_num: number | null,
     public fechaRegistro: string | null,

@@ -11,6 +11,8 @@
                 <svg cIcon class="me-1" name="cil-dollar"></svg>Registrar pago</button>&nbsp;
             <button cButton type="button" (click)="toExcel()" color="secondary" size="sm" disabled>
                 <svg cIcon class="me-1" name="cil-spreadsheet"></svg>Excel</button>&nbsp;
+            <button cButton type="button" (click)="openDeuda()" color="secondary" size="sm">
+                <svg cIcon class="me-1" name="cil-pencil"></svg>Modificar</button>&nbsp;
             <button cButton color="secondary" size="sm" type="button" (click)="cancel()">
                 <svg cIcon class="me-1" name="cil-arrow-left"></svg>Regresar</button>
             <hr />
@@ -32,7 +34,10 @@
                             <td style="width: 40px;" title="Cod: {{item.idDeuda}}"><input type="checkbox" cFormCheckInput [checked]="item.selected" [disabled]="esPagado(item.estadoDeuda)"/></td>
                             <td scope="row" style="width: 50px;">{{ i + 1 }}</td>
                             <td>{{ item.concepto }}</td>
-                            <td class="align-right" style="font-weight: bold;">{{ item.montoRestante > 0 ? item.montoRestante : item.monto}}</td>
+                            <td class="align-right" style="font-weight: bold;" [title]="item.montoRestante > 0 ? 'Debe ' + item.montoRestante +' de ' + item.monto : ''">
+                                <svg *ngIf="item.montoRestante > 0" cIcon class="me-1" name="cil-warning"></svg>
+                                {{ item.montoRestante > 0 ? item.montoRestante : item.monto}}
+                            </td>
                             <td style="width: 100px;">
                                 <svg cIcon [class]="esPagado(item.estadoDeuda) ? 'me-0 text-success' : 'me-0 text-danger'" [name]="esPagado(item.estadoDeuda) ? 'cil-check': 'cil-av-timer'"></svg>
                                 {{ estadoDeuda(item.estadoDeuda)}}
@@ -214,4 +219,97 @@
             <p>El registro no tiene imágenes</p>
         </ng-template>
     </c-modal-body>
+</c-modal>
+
+
+<c-modal #modalLg id="modalLg" [visible]="modalDeudaVisible" (visibleChange)="handleModalDeudaChange($event)"
+    backdrop="static">
+    <form cForm [formGroup]="deudaForm" novalidate (ngSubmit)="onDeudaSubmit()">
+        <c-modal-header>
+            <h5 cModalTitle>{{deudaForm.controls['idDeuda'].value ? 'Modificar' : 'Pagar'}} deuda</h5>
+            <button (click)="handleModalDeudaChange(false)" cButtonClose></button>
+        </c-modal-header>
+        <c-modal-body class="register-form">
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col">Concepto</label>
+                <c-col [sm]="8" *ngIf="deudaForm.controls['idConcepto'] as ctrl">
+                    <ng-select [items]="conceptos" bindLabel="concepto" bindValue="idConcepto"
+                        placeholder="Seleccionar" formControlName="idConcepto" [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
+                    </ng-select>
+                    <c-form-feedback [valid]="!ctrl.invalid">
+                        <ng-container *ngIf="ctrl.errors as errors">
+                            <div *ngIf="errors.required">Seleccionar concepto
+                            </div>
+                        </ng-container>
+                    </c-form-feedback>
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="monto">Monto</label>
+                <c-col [sm]="8" *ngIf="deudaForm.controls['monto'] as ctrl">
+                    <input cFormControl id="monto" type="text" formControlName="monto" placeholder="Monto"
+                            autocomplete="off" required [readonly]="readOnlyMonto"
+                            [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                        <c-form-feedback [valid]="!ctrl.invalid">
+                            <ng-container *ngIf="ctrl.errors as errors">
+                                <div *ngIf="errors.required">monto es requerido</div>
+                                <div *ngIf="errors.pattern">
+                                    Ingrese datos numéricos
+                                </div>
+                                <div *ngIf="errors.max">
+                                    Superó la cantidad límite
+                                </div>
+                                <div *ngIf="errors.min">
+                                    Ingrese número mayor a "0"
+                                </div>
+                            </ng-container>
+                        </c-form-feedback>
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col" for="montoRestante">Monto restante</label>
+                <c-col [sm]="8" *ngIf="deudaForm.controls['montoRestante'] as ctrl">
+                    <input cFormControl id="montoRestante" type="text" formControlName="montoRestante" placeholder="Monto restante"
+                            autocomplete="off" required 
+                            [valid]="ctrl.touched && ctrl.valid ? true : ctrl.touched && ctrl.invalid ? false : undefined" />
+                        <c-form-feedback [valid]="!ctrl.invalid">
+                            <ng-container *ngIf="ctrl.errors as errors">
+                                <div *ngIf="errors.required">monto es requerido</div>
+                                <div *ngIf="errors.pattern">
+                                    Ingrese datos numéricos
+                                </div>
+                                <div *ngIf="errors.max">
+                                    Superó la cantidad límite
+                                </div>
+                                <div *ngIf="errors.min">
+                                    Ingrese número mayor a "0"
+                                </div>
+                            </ng-container>
+                        </c-form-feedback>
+                </c-col>
+            </c-row>
+            <c-row class="mb-1">
+                <label cCol [sm]="4" cLabel="col">Estado deuda</label>
+                <c-col [sm]="8" *ngIf="deudaForm.controls['estadoDeuda'] as ctrl">
+                    <ng-select [items]="estadoDeudas" bindLabel="label" bindValue="value" placeholder="Seleccionar"
+                        formControlName="estadoDeuda" [ngClass]="{'is-invalid': ctrl.invalid && ctrl.touched}">
+                    </ng-select>
+                    <c-form-feedback [valid]="!ctrl.invalid">
+                        <ng-container *ngIf="ctrl.errors as errors">
+                            <div *ngIf="errors.required">Estado es requerido</div>
+                        </ng-container>
+                    </c-form-feedback>
+                </c-col>
+            </c-row>
+
+        </c-modal-body>
+        <c-modal-footer>
+            <button cButton color="primary" type="submit" [disabled]="deudaForm.invalid" [tabindex]="'0'">
+                <svg cIcon class="me-1" name="cil-save"></svg>Guardar
+            </button>&nbsp;
+            <button cButton color="secondary" type="reset" (click)="onResetDeudaForm()" [tabindex]="'0'">
+                <svg cIcon class="me-1" name="cil-x"></svg>Cancelar
+            </button>
+        </c-modal-footer>
+    </form>
 </c-modal>

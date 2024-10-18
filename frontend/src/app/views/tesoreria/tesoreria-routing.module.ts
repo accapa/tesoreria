@@ -7,6 +7,8 @@ import { DeudaListComponent } from './deuda-list/deuda-list.component';
 import { EgresoComponent } from './egreso/egreso.component';
 import { ExcelComponent } from './reportes/export-excel/excel.component';
 import { ActaComponent } from './reportes/acta/acta.component';
+import { AlumnoConceptoComponent } from './reportes/alumno-concepto/alumno-concepto.component';
+import { BalanceGrupoComponent } from './reportes/balance-grupo/balance-grupo.component';
 import { primaryKeyAsig } from './egreso/egreso.model';
 import { primaryKeyActivo } from './pago/pago.model';
 import { primaryKeyAlumno } from '../admin/alumno/alumno.model';
@@ -103,7 +105,25 @@ const routes: Routes = [
           defaultSort: `${primaryKeyActivo},desc`,
           roles: [Roles.Admin],
         }
-      },  
+      }, 
+      {
+        path: 'reportes/alumno-concepto',
+        canActivate: [authGuard],
+        component: AlumnoConceptoComponent,
+        data: {
+          title: 'Reporte de alumnos por concepto',
+          roles: [Roles.Admin]
+        }
+      },
+      {
+        path: 'reportes/balance-grupo',
+        canActivate: [authGuard],
+        component: BalanceGrupoComponent,
+        data: {
+          title: 'Balance por grupo',
+          roles: [Roles.Admin]
+        }
+      },
     ]
   }
 ];
