@@ -18,7 +18,8 @@ import { BalanceGrupoDto } from './balance-grupo.dto';
 })
 export class BalanceGrupoComponent extends BaseComponent {
   balances: BalanceGrupoDto[] | null = null;
-  total = 0;
+  totalIngreso = 0;
+  totalEgreso = 0;
   grupos: Grupo[] | null = null;
   searchForm!: FormGroup;
   constructor(
@@ -69,12 +70,11 @@ export class BalanceGrupoComponent extends BaseComponent {
         next: (res: any) => {
           this.spinner.hide();
           this.balances = res;
-          const conceptoTotal = this.balances?.reduce((total, dato) => total + dato.total, 0) || 0;
-          const montoSum = this.balances?.reduce((accumulator, item) => {
-            const egresoTotal = item.egresos.reduce((sum, egreso) => sum + egreso.monto * -1, 0);
+          this.totalIngreso = this.balances?.reduce((total, dato) => total + dato.total, 0) || 0;
+          this.totalEgreso = this.balances?.reduce((accumulator, item) => {
+            const egresoTotal = item.egresos.reduce((sum, egreso) => sum + egreso.monto, 0);
             return accumulator + egresoTotal;
-          }, 0);
-          this.total = conceptoTotal + (montoSum || 0)
+          }, 0) || 0;
         },
         error: (e) => {
           this.spinner.hide();

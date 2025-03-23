@@ -2,11 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Log;
-use App\Model\{Alumno, Archivo, Deuda, Pago, PagoDeuda, Saldo};
-use App\Model\Enums\{Estado, EstadoDeuda};
-use Exception;
+use App\Model\{Alumno, Archivo, Deuda, Pago, PagoDeuda, PagoTipo, Saldo};
+use App\Model\Enums\{Estado, EstadoDeuda, TipoPago};
 use Illuminate\Support\Facades\DB;
 use PDOException;
+use Exception;
 
 class PagoController extends Controller
 {
@@ -92,7 +92,7 @@ class PagoController extends Controller
                 $idGrupo = $rowAlumno->idGrupo;
             }
 
-            if (!empty($data["idAlumno"] ?? null) && $aplicarSaldo == "true") {
+            if (!empty($data["idAlumno"] ?? null) && $aplicarSaldo == "true") { // En caso que el alumno tenga saldo a favor
                 $logger->debug("Aplicando saldo");
                 $saldos = Saldo::where("idAlumno", "=", $data["idAlumno"])->where("estado", "=", Estado::ACTIVO->value)->get()->toArray();
                 $logger->debug("saldos", [$saldos]);
@@ -103,7 +103,7 @@ class PagoController extends Controller
                 $logger->debug("Sin aplicar saldo", [$data["idAlumno"]]);
                 $pago->idAlumno = empty($data["idAlumno"] ?? "") ? null : $data["idAlumno"];
                 $pago->idGrupo = $idGrupo;
-                $pago->idPagoTipo = 1; // todo: falta afinar
+                $pago->idPagoTipo = $data["idPagoTipo"] ?? TipoPago::CUOTA->value;
                 $pago->monto = $data["monto"];
                 $pago->operacion = $data["operacion"];
                 $pago->observacion = $data["observacion"];
@@ -220,5 +220,10 @@ class PagoController extends Controller
         } catch (Exception $e) {
             header("HTTP/1.0 404 " . $e->getMessage());
         }
+    }
+
+    public function listPagoTipo(): void{
+        $list = TipoPago::list();
+        echo json_encode($list);
     }
 }

@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Grupo } from '../../admin/grupo/grupo.model';
 import { Pago } from './pago.model';
+import { PagoTipo } from './pago-tipo.model';
 import { BaseComponent } from '../../../shared/base/base.component';
 import { ToastService } from 'src/app/shared/toast/toast.service';
 import { ArchivoService } from 'src/app/views/archivo/archivo.service';
@@ -26,6 +27,7 @@ export class PagoComponent extends BaseComponent {
   modalMantFormVisible = false;
   modalListAsignacionVisible = false;
   activos: Pago[] | null = null;
+  pagoTipos: PagoTipo[] | null = null;
   activo: any | null = null;
   grupos: Grupo[] | null = null;
   alumnos: Alumno[] | null = null;
@@ -44,7 +46,7 @@ export class PagoComponent extends BaseComponent {
     private formBuilder: FormBuilder, private toastService: ToastService,
     public _spinner: NgxSpinnerService,
     private pagoService: PagoService,
-    private sucursalService: GrupoService,
+    private grupoService: GrupoService,
     private archivoService: ArchivoService,
     private alumnoService: AlumnoService
   ) {
@@ -59,9 +61,18 @@ export class PagoComponent extends BaseComponent {
   }
 
   private listGrupo(): void {
-    this.sucursalService.listGrupoCombo().subscribe({
+    this.grupoService.listGrupoCombo().subscribe({
       next: (res: any) => {
         this.grupos = res;
+      },
+      error: e => { this.spinner.hide(); this.toastService.onError(e); }
+    });
+  }
+
+  private listPagoTipo(): void {
+    this.pagoService.listPagoTipo().subscribe({
+      next: (res: any) => {
+        this.pagoTipos = res;
       },
       error: e => { this.spinner.hide(); this.toastService.onError(e); }
     });
@@ -73,6 +84,7 @@ export class PagoComponent extends BaseComponent {
         idPago: [null],
         idGrupo: [null, [Validators.required]],
         idAlumno: [null],
+        idPagoTipo: [null],
         operacion: [null, [Validators.required]],
         monto: [null, [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.max(9999), Validators.min(0)]],
         fechaComprobante: [null, [Validators.required]],
@@ -112,7 +124,7 @@ export class PagoComponent extends BaseComponent {
   }
 
   public handleModalChangeImg(event: boolean) {
-    this.modalFotoVisible = event; 
+    this.modalFotoVisible = event;
   }
 
   public generarRecibo(): void {
@@ -198,10 +210,10 @@ export class PagoComponent extends BaseComponent {
     this.spinner.show();
     this.pagoService.find(compra.idPago).subscribe({
       next: (compra: Pago) => {
-        this.loadCombos();
         this.spinner.hide();
         this.modalFormVisible = !this.modalFormVisible;
         this.pagoForm.patchValue(compra);
+        this.loadCombos();
       },
       error: (e) => { this.spinner.hide(); this.toastService.onError(e); }
     });
@@ -210,6 +222,9 @@ export class PagoComponent extends BaseComponent {
   private loadCombos(): void {
     if (!this.grupos)
       this.listGrupo();
+    if (!this.pagoTipos)
+      this.listPagoTipo();
+    this.listAlumno()
   }
 
   public toggleSearchForm(): void {

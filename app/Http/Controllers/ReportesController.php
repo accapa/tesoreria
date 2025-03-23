@@ -90,10 +90,14 @@ class ReportesController extends Controller
                 throw new Exception(str_encode("El parámetro debe ser numérico"));
             }
             $resultados = DB::select('CALL SP_REPORTE_BALANCE_GRUPO(?)', [$data["idGrupo"]]);
-            foreach($resultados as $row) {
+            foreach ($resultados as $row) {
+                if ($row->idConcepto == null) {
+                    $row->egresos = [];
+                    continue;
+                }
                 $egresos = Egreso::select("observacion", "monto")
-                ->where("idConcepto", "=", $row->idConcepto)
-                ->orderBy("idEgreso", "asc")->get()->toArray();
+                    ->where("idConcepto", "=", $row->idConcepto)
+                    ->orderBy("idEgreso", "asc")->get()->toArray();
                 $row->egresos = $egresos;
             }
             echo json_encode($resultados);

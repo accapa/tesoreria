@@ -146,6 +146,14 @@
                         </c-col>
                     </c-row>
                     <c-row class="mb-1">
+                        <label cCol [sm]="4" cLabel="col">Tipo pago</label>
+                        <c-col [sm]="8" *ngIf="pagoForm.controls['idPagoTipo'] as ctrl">
+                            <ng-select [items]="pagoTipos" bindLabel="label" bindValue="value"
+                                placeholder="Seleccionar" formControlName="idPagoTipo">
+                            </ng-select>
+                        </c-col>
+                    </c-row>
+                    <c-row class="mb-1">
                         <label cCol [sm]="4" cLabel="col" for="operacion">Nro. de operación</label>
                         <c-col [sm]="8" *ngIf="pagoForm.controls['operacion'] as ctrl">
                             <input cFormControl id="operacion" type="text" formControlName="operacion"

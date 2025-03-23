@@ -42,8 +42,8 @@ export class PagoService {
     return this.http.delete<any[]>(`${this.resourceUrl}/Archivo/delete/${code_id_activo}`);
   }
 
-  listActivoByCustodio(id_trabajador: number): Observable<IPago> {
-    return this.http.get<IPago>(`${this.resourceUrl}/Pago/listActivoByCustodio/${id_trabajador}`);
+  listPagoTipo(): Observable<IPago> {
+    return this.http.get<IPago>(`${this.resourceUrl}/Pago/listPagoTipo`);
   }
 
   getMonthByNumber(meses: number): Observable<any> {
